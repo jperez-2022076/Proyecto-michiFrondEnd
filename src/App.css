@@ -1,0 +1,22 @@
+
+
+/* App.css */
+.card {
+  max-width: 100%;
+  max-height: 100%;
+}
+.bg-gradient-primary {
+  height: 100vh; /* Asegúrate de que el fondo cubra toda la altura del viewport */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.form-control-user {
+  border-radius: 0.35rem;
+}
+
+.btn-user {
+  border-radius: 0.35rem;
+}

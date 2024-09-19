@@ -1,0 +1,36 @@
+/* Asegúrate de que el wrapper tenga el diseño adecuado */
+.wrapper {
+  display: flex;
+  align-items: stretch;
+}
+
+.sidebar {
+  transition: width 0.3s ease;
+  width: 250px; /* Ancho cuando el sidebar está visible */
+}
+
+.sidebar.hide {
+  width: 0; /* Ancho cuando el sidebar está oculto */
+  overflow: hidden;
+  display: none; /* Oculta el sidebar completamente */
+}
+
+.sidebar.show {
+  width: 250px; /* Ancho cuando el sidebar está visible */
+  display: block; /* Asegúrate de que el sidebar esté visible */
+}
+
+/* Asegura el comportamiento del sidebar en pantallas pequeñas */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 250px; /* Ancho para pantallas pequeñas */
+  }
+
+  .sidebar.hide {
+    display: none; /* Oculta el sidebar en pantallas pequeñas */
+  }
+
+  .sidebar.show {
+    display: block; /* Muestra el sidebar en pantallas pequeñas */
+  }
+}
