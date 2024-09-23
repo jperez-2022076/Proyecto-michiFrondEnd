@@ -1,0 +1,31 @@
+.icon-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px; /* Tamaño del círculo */
+    height: 36px;
+    border-radius: 50%; /* Hace que el fondo sea redondo */
+    color: white;
+    border: none; /* Elimina el borde */
+    box-shadow: none; /* Elimina cualquier sombra del botón */ /* Color del ícono */
+  }
+  
+  .icon-delete {
+    background-color: #dc3545; /* Rojo para eliminar */
+  }
+  
+  .icon-history {
+    background-color: #007bff; /* Azul para historial */
+  }
+  
+  .icon-edit {
+    background-color: #ffc107; /* Amarillo para editar */
+  }
+  
+  .icon-wrapper .fa-icon {
+    font-size: 16px; /* Tamaño del ícono */
+  }
+  
+
+
+  

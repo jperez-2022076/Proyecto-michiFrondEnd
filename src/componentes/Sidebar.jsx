@@ -20,9 +20,40 @@ const Sidebar = ({ isSidebarVisible }) => {
 
       {/* Nav Item - Dashboard */}
       <li className="nav-item">
+        <a className="nav-link" href="/login">
+          <i className="fas fa-fw fa-tachometer-alt"></i>
+          <span>Historial De Vehiculos</span>
+        </a>
+      </li>
+   
+      <li className="nav-item">
         <a className="nav-link" href="index.html">
           <i className="fas fa-fw fa-tachometer-alt"></i>
-          <span>Dashboard</span>
+          <span>Historial De Personas</span>
+        </a>
+      </li>
+      <div class="sidebar-heading">
+                Administrar
+            </div>
+
+      <hr className="sidebar-divider my-0" />
+      <li className="nav-item">
+        <a className="nav-link" href="index.html">
+          <i className="fas fa-fw fa-tachometer-alt"></i>
+          <span>Vehiculos</span>
+        </a>
+      </li>
+  
+      <li className="nav-item">
+        <a className="nav-link" href="index.html">
+          <i className="fas fa-fw fa-tachometer-alt"></i>
+          <span>Personas</span>
+        </a>
+      </li>
+      <li className="nav-item">
+        <a className="nav-link" href="index.html">
+          <i className="fas fa-fw fa-tachometer-alt"></i>
+          <span>Usuarios</span>
         </a>
       </li>
 

@@ -1,27 +1,20 @@
 import React, { useState } from 'react';
 import './App.css';
-import Navbar from './componentes/Navbar.jsx';
-import Sidebar from './componentes/Sidebar.jsx';
-import Table from './componentes/table.jsx';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
+import { useRoutes } from 'react-router-dom';
+import { routes } from './routes.jsx';
 const App = () => {
-  const [isSidebarVisible, setSidebarVisible] = useState(true);
-
-  const toggleSidebar = () => {
-    setSidebarVisible(!isSidebarVisible);
-  };
-
+  const element = useRoutes(routes);
   return (
-    <div id="wrapper" className={isSidebarVisible ? '' : 'toggled'}>
-      <Sidebar isSidebarVisible={isSidebarVisible} />
-      <div id="content-wrapper" className="d-flex flex-column">
-        <Navbar toggleSidebar={toggleSidebar} />
-        <div id="content">
-          <Table />
-        </div>
-      </div>
-    </div>
+    <>
+      <ToastContainer />  {/* Asegúrate de que esté dentro del árbol de componentes */}
+      {element}
+    </>
   );
 };
 
 export default App;
+
+
