@@ -3,7 +3,7 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { Login } from './Pages/Login';
 import { HomePage } from './Pages/HomePages/HomePages';
-import Table from './componentes/table';
+import Table from './componentes/Table';
 
 export const routes = [
     { path: "/", element: <Navigate to="/login" /> },
