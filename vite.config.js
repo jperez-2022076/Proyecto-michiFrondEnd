@@ -5,3 +5,4 @@ export default defineConfig({
   base: './', // Asegúrate de usar './' si quieres rutas relativas para producción
   plugins: [react()],
 })
+
