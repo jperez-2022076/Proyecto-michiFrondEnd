@@ -28,4 +28,20 @@
   
 
 
-  
+/* Estilo personalizado para el contenedor del select */
+.custom-select-container select {
+  padding: 5px 15px;
+  border-radius: 4px;
+  background-color: #fff;
+  background-position: right 10px center;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* Opcional: ajuste para el label */
+.dataTables_length label {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Espacio entre texto y select */
+}

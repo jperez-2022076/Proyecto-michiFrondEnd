@@ -262,7 +262,12 @@ const Table = () => {
       if ($.fn.dataTable.isDataTable(dataTableRef.current)) {
         $(dataTableRef.current).DataTable().destroy();
       }
-      $(dataTableRef.current).DataTable();
+      $(dataTableRef.current).DataTable({
+        language: {
+          lengthMenu: 'Mostrar <span class="custom-select-container">_MENU_</span> cantidad de registros',
+          info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+        }
+      });
     }
   }, [usuarios]);
 
@@ -330,28 +335,6 @@ const Table = () => {
                   <button className="btn btn-primary" onClick={() => toggleForm('add')}>
                     Agregar
                   </button>
-                  <div className="dropdown">
-                    <button
-                      className="btn btn-primary dropdown-toggle"
-                      type="button"
-                      id="dropdownMenuButton"
-                      data-toggle="dropdown"
-                      aria-haspopup="true"
-                      aria-expanded="false"
-                    >
-                      Exportar
-                    </button>
-                    <div className="dropdown-menu dropdown-menu-right animated--fade-in" aria-labelledby="dropdownMenuButton">
-                      <a className="dropdown-item" href="#">
-                        <FontAwesomeIcon icon={faFilePdf} className="mr-2" />
-                        Exportar a PDF
-                      </a>
-                      <a className="dropdown-item" href="#">
-                        <FontAwesomeIcon icon={faFileExcel} className="mr-2" />
-                        Exportar a Excel
-                      </a>
-                    </div>
-                  </div>
                 </div>
                 <div className="card-body">
                   <div className="table-responsive">

@@ -45,13 +45,13 @@ const Sidebar = ({ isSidebarVisible }) => {
       </li>
   
       <li className="nav-item">
-        <a className="nav-link" href="index.html">
+        <a className="nav-link" href="/Personas">
           <i className="fas fa-fw fa-tachometer-alt"></i>
           <span>Personas</span>
         </a>
       </li>
       <li className="nav-item">
-        <a className="nav-link" href="index.html">
+        <a className="nav-link" href="/Usuarios">
           <i className="fas fa-fw fa-tachometer-alt"></i>
           <span>Usuarios</span>
         </a>
