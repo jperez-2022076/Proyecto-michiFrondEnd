@@ -24,7 +24,7 @@ export const useLogin = () => {
         const { token } = response.data;
         localStorage.setItem('token', token);
         toast.success(`Bienvenido`);
-        navigate('/Personas');
+        navigate('/Usuarios');
         success = true;
       }
     } catch (error) {

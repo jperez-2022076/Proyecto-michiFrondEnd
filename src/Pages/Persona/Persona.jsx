@@ -15,7 +15,7 @@ import InputMask from 'react-input-mask';
 import axios from 'axios';
 import useActualizarPersona from '../../shared/hooks/Persona/PersonaActualizar';
 import useEliminarPersona from '../../shared/hooks/Persona/PersonaEliminar';
-import { exportarPdf } from '../../services/api';
+
 import { Dropdown } from 'react-bootstrap';
 
 

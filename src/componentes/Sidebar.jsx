@@ -1,60 +1,68 @@
 import React from 'react';
 import './Estilo.css'; // Importamos el CSS personalizado
+import { useNavigate } from 'react-router-dom'; // Importa useNavigate
 
 const Sidebar = ({ isSidebarVisible }) => {
+  const navigate = useNavigate(); // Usa useNavigate
+
   return (
     <ul
       className={`navbar-nav bg-gradient-primary sidebar sidebar-dark accordion ${isSidebarVisible ? 'show' : 'hide'}`}
       id="accordionSidebar"
     >
       {/* Sidebar - Brand */}
-      <a className="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+      <div className="sidebar-brand d-flex align-items-center justify-content-center" onClick={() => navigate('/')}>
         <div className="sidebar-brand-icon rotate-n-15">
           <i className="fas fa-laugh-wink"></i>
         </div>
         <div className="sidebar-brand-text mx-3">SB Admin <sup>2</sup></div>
-      </a>
+      </div>
 
       {/* Divider */}
       <hr className="sidebar-divider my-0" />
 
-      {/* Nav Item - Dashboard */}
+      {/* Nav Item - Historial de Vehiculos */}
       <li className="nav-item">
-        <a className="nav-link" href="/login">
+        <button className="nav-link" onClick={() => navigate('/login')}>
           <i className="fas fa-fw fa-tachometer-alt"></i>
           <span>Historial De Vehiculos</span>
-        </a>
+        </button>
       </li>
-   
+
+      {/* Nav Item - Historial de Personas */}
       <li className="nav-item">
-        <a className="nav-link" href="index.html">
+        <button className="nav-link" onClick={() => navigate('/')}>
           <i className="fas fa-fw fa-tachometer-alt"></i>
           <span>Historial De Personas</span>
-        </a>
+        </button>
       </li>
-      <div class="sidebar-heading">
-                Administrar
-            </div>
+
+      <div className="sidebar-heading">Administrar</div>
 
       <hr className="sidebar-divider my-0" />
+
+      {/* Nav Item - Vehiculos */}
       <li className="nav-item">
-        <a className="nav-link" href="index.html">
+        <button className="nav-link" onClick={() => navigate('/')}>
           <i className="fas fa-fw fa-tachometer-alt"></i>
           <span>Vehiculos</span>
-        </a>
+        </button>
       </li>
-  
+
+      {/* Nav Item - Personas */}
       <li className="nav-item">
-        <a className="nav-link" href="/Personas">
+        <button className="nav-link" onClick={() => navigate('/Personas')}>
           <i className="fas fa-fw fa-tachometer-alt"></i>
           <span>Personas</span>
-        </a>
+        </button>
       </li>
+
+      {/* Nav Item - Usuarios */}
       <li className="nav-item">
-        <a className="nav-link" href="/Usuarios">
+        <button className="nav-link" onClick={() => navigate('/Usuarios')}>
           <i className="fas fa-fw fa-tachometer-alt"></i>
           <span>Usuarios</span>
-        </a>
+        </button>
       </li>
 
       {/* Other nav items... */}
