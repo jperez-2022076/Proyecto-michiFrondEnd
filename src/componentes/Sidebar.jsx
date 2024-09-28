@@ -1,7 +1,9 @@
 import React from 'react';
 import './Estilo.css'; // Importamos el CSS personalizado
 import { useNavigate } from 'react-router-dom'; // Importa useNavigate
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTruck, faTachometerAlt } from '@fortawesome/free-solid-svg-icons';
+import logo from '../img/logo.png';
 const Sidebar = ({ isSidebarVisible }) => {
   const navigate = useNavigate(); // Usa useNavigate
 
@@ -11,29 +13,30 @@ const Sidebar = ({ isSidebarVisible }) => {
       id="accordionSidebar"
     >
       {/* Sidebar - Brand */}
+      <br />
       <div className="sidebar-brand d-flex align-items-center justify-content-center" onClick={() => navigate('/')}>
-        <div className="sidebar-brand-icon rotate-n-15">
-          <i className="fas fa-laugh-wink"></i>
-        </div>
-        <div className="sidebar-brand-text mx-3">SB Admin <sup>2</sup></div>
+     
+        <img src={logo} alt="Toggle Sidebar" width="150" height="80" />
+       
+        <div className="sidebar-brand-text mx-3">OINSA </div>
       </div>
 
       {/* Divider */}
       <hr className="sidebar-divider my-0" />
-
+    <br />
       {/* Nav Item - Historial de Vehiculos */}
       <li className="nav-item">
         <button className="nav-link" onClick={() => navigate('/login')}>
-          <i className="fas fa-fw fa-tachometer-alt"></i>
-          <span>Historial De Vehiculos</span>
+        <FontAwesomeIcon icon={faTruck} /> 
+          <span> Historial De Vehiculos</span>
         </button>
       </li>
 
       {/* Nav Item - Historial de Personas */}
       <li className="nav-item">
         <button className="nav-link" onClick={() => navigate('/')}>
-          <i className="fas fa-fw fa-tachometer-alt"></i>
-          <span>Historial De Personas</span>
+        <FontAwesomeIcon icon={faTruck} /> 
+          <span> Historial De Personas</span>
         </button>
       </li>
 
@@ -43,25 +46,25 @@ const Sidebar = ({ isSidebarVisible }) => {
 
       {/* Nav Item - Vehiculos */}
       <li className="nav-item">
-        <button className="nav-link" onClick={() => navigate('/')}>
-          <i className="fas fa-fw fa-tachometer-alt"></i>
-          <span>Vehiculos</span>
+        <button className="nav-link" onClick={() => navigate('/Vehiculos')}>
+        <FontAwesomeIcon icon={faTruck} /> 
+          <span> Vehiculos</span>
         </button>
       </li>
 
       {/* Nav Item - Personas */}
       <li className="nav-item">
         <button className="nav-link" onClick={() => navigate('/Personas')}>
-          <i className="fas fa-fw fa-tachometer-alt"></i>
-          <span>Personas</span>
+        <FontAwesomeIcon icon={faTruck} /> 
+          <span> Personas</span>
         </button>
       </li>
 
       {/* Nav Item - Usuarios */}
       <li className="nav-item">
         <button className="nav-link" onClick={() => navigate('/Usuarios')}>
-          <i className="fas fa-fw fa-tachometer-alt"></i>
-          <span>Usuarios</span>
+        <FontAwesomeIcon icon={faTruck} /> 
+          <span> Usuarios</span>
         </button>
       </li>
 

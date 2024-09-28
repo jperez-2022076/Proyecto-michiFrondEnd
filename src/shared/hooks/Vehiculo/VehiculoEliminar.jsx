@@ -1,23 +1,20 @@
 import { useState } from "react";
-import { eliminarPersonas } from "../../../services/api";
-import toast from "react-hot-toast";
+import { eliminarVehiculos } from "../../../services/api";
 
-
-
-const useEliminarPersona = () =>{
+const useEliminarVehiculo =()=>{
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const eliminarPersona = async(id, onDelete)=>{
+    const eliminarVehiculo = async(id,onDelete)=>{
         setLoading(true);
         setError(null);
         try {
-            const response = await eliminarPersonas(id)
+            const response = await eliminarVehiculos(id)
             if (response.error) {
                 setError(response.err);
-                toast.error('Error al eliminar el persona');
+                toast.error('Error al eliminar el vehiculo');
               } else {
-                toast.success('Persona eliminado exitosamente');
+                toast.success('Vehiculo eliminado exitosamente');
                 if (onDelete) {
                   onDelete(); // Ejecutar callback de éxito
                 }
@@ -29,7 +26,6 @@ const useEliminarPersona = () =>{
             setLoading(false);
           }
     }
-    return {eliminarPersona, loading, error}
+    return {eliminarVehiculo, loading,error}
 }
-
-export default useEliminarPersona
+export default useEliminarVehiculo

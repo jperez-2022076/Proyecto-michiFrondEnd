@@ -123,3 +123,38 @@ export const listarVehiculo = async() =>{
     }
   }
 }
+
+export const agregarVehiculoRequest =async (data)=>{
+  try {
+    return await apiClient.post('https://proyecto-michi.vercel.app/vehiculo/agregar', data)
+ } catch (err) {
+   return {
+     error: true,
+     err
+   }
+ }
+}
+
+
+export const actualizarVehiculos = async(id,data)=>{
+  try {
+    return await apiClient.put(`https://proyecto-michi.vercel.app/vehiculo/actualizar/${id}`, data)
+  } catch (err) {
+    return{
+      error: true,
+      err,
+    }
+  }
+}
+
+export const eliminarVehiculos = async(id)=>{
+  try {
+    return await apiClient.delete(`https://proyecto-michi.vercel.app/vehiculo/eliminar/${id}`)
+  } catch (err) {
+    return{
+      error: true,
+      err,
+    }
+  }
+}
+

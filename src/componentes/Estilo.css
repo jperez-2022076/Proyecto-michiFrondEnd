@@ -1,12 +1,16 @@
-/* Asegúrate de que el wrapper tenga el diseño adecuado */
 .wrapper {
   display: flex;
   align-items: stretch;
 }
 
 .sidebar {
-  transition: width 0.3s ease;
   width: 250px; /* Ancho cuando el sidebar está visible */
+  transition: width 0.5s ease;
+  position: sticky; /* Mantiene el sidebar visible al hacer scroll */
+  top: 0; /* Se adhiere al principio de la ventana */
+  height: 100vh; /* Asegura que el sidebar ocupe toda la altura de la pantalla */
+ 
+  background-color: #f8f9fa; /* Fondo opcional */
 }
 
 .sidebar.hide {

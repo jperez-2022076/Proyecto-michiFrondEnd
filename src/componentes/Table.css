@@ -30,10 +30,10 @@
 
 /* Estilo personalizado para el contenedor del select */
 .custom-select-container select {
-  padding: 5px 15px;
-  border-radius: 4px;
+  padding: 2px 15px;
+  border-radius: 5px;
   background-color: #fff;
-  background-position: right 10px center;
+  background-position: right 5px center;
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -45,3 +45,19 @@
   align-items: center;
   gap: 8px; /* Espacio entre texto y select */
 }
+
+
+/* Estilos para hacer zoom en la imagen */
+.table img {
+  transition: transform 0.3s ease; /* Transición suave */
+}
+
+.table img:hover {
+  transform: scale(2.5); /* Escala la imagen un 50% más grande */
+  z-index: 10; /* Asegúrate de que la imagen se superponga a otros elementos */
+  position: relative; /* Posiciona la imagen para superposición */
+}
+
+
+
+

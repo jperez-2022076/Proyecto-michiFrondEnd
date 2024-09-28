@@ -439,7 +439,11 @@ const Personas = () => {
                             <td>{persona.DPI}</td>
                             <td>
                               {persona.fotoP !== 'Sin foto' ? (
-                                <img src={persona.fotoP} alt="Foto de la persona" style={{ width: '50px', height: '50px' }} />
+                                <img
+                                  src={persona.fotoP}
+                                  alt="Foto de la persona"
+                                  style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                                />
                               ) : (
                                 'Sin foto'
                               )}
@@ -461,6 +465,7 @@ const Personas = () => {
                       </tbody>
                     </table>
                   </div>
+
                 </div>
               </>
             )}

@@ -1,22 +1,21 @@
 import { useState } from "react";
-import { actualizarPersonas } from "../../../services/api";
+import { actualizarVehiculos } from "../../../services/api";
 import { toast } from 'react-hot-toast';
 
-const useActualizarPersona = ()=>{
+const useActualizarVehiculo = ()=>{
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const actualizarPersona = async (id,userData, onSuccess)=>{
+    const actualizarVehiculo = async(id,userData, onSuccess)=>{
         setLoading(true)
         setError(null)
         try {
-            const response = await actualizarPersonas(id, userData)
-
+            const response = await actualizarVehiculos(id,userData)
             if (response.error) {
                 setError(response.err);
-                toast.error('Error al actualizar persona');
+                toast.error('Error al actualizar vehiculo');
               } else {
-                toast.success('Persona actualizado exitosamente');
+                toast.success('Vehiculo actualizado exitosamente');
                 if (onSuccess) {
                   onSuccess(); // Ejecutar callback de éxito
                 }
@@ -30,9 +29,6 @@ const useActualizarPersona = ()=>{
             setLoading(false);
           }
     }
-    return {actualizarPersona, loading,error}
-
+    return {actualizarVehiculo,loading,error}
 }
-
-
-export default useActualizarPersona
+export default useActualizarVehiculo

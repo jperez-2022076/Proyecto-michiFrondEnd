@@ -1,5 +1,6 @@
 import React from 'react';
 import menuIcon from '../img/menu.png';
+import './Estilo.css'; 
 
 const Navbar = ({ toggleSidebar }) => {
   return (
