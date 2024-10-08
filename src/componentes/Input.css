@@ -1,12 +1,36 @@
-.form-control-user {
-    border-radius: 10px;
-    padding: 15px;
-    font-size: 16px;
-    border: 1px solid #d1d3e2;
-  }
+.form-control-users {
+
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #d1d3e2;
+  padding-right: 10px; 
+  margin-bottom: 10px;
+}
+
+.form-control-user:focus {
+  border-color: #4e73df;
+  box-shadow: 0 0 5px rgba(78, 115, 223, 0.5);
+}
+
+.input-group {
+  position: relative;
+}
+
+.input-icon {
   
-  .form-control-user:focus {
-    border-color: #4e73df;
-    box-shadow: 0 0 5px rgba(78, 115, 223, 0.5);
-  }
-  
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #6e707e; /* Puedes ajustar el color del ícono si es necesario */
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon:hover {
+  color: #4e73df; /* Cambia de color al pasar sobre el ícono */
+}
+
+

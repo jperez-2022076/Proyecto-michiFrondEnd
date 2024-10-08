@@ -3,6 +3,10 @@
   align-items: stretch;
 }
 
+.color {
+  background-color: #fed24d !important; /* Sobrescribe el color de fondo */
+}
+
 .sidebar {
   width: 250px; /* Ancho cuando el sidebar está visible */
   transition: width 0.5s ease;
@@ -12,6 +16,8 @@
  
   background-color: #f8f9fa; /* Fondo opcional */
 }
+
+
 
 .sidebar.hide {
   width: 0; /* Ancho cuando el sidebar está oculto */
@@ -37,6 +43,21 @@
   .sidebar.show {
     display: block; /* Muestra el sidebar en pantallas pequeñas */
   }
+}
+/* Navbar */
+.navbar {
+  height: 30px; /* Define la altura deseada */
+  display: flex; /* Usa flexbox para la alineación */
+  align-items: center; /* Centra verticalmente los elementos dentro del navbar */
+
+}
+
+
+
+.navbar img {
+  margin-top: 10px;
+  max-height: 60px; /* Ajusta la altura de la imagen si es necesario */
+ 
 }
 
 

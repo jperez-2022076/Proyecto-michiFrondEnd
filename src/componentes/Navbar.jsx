@@ -4,13 +4,10 @@ import './Estilo.css';
 
 const Navbar = ({ toggleSidebar }) => {
   return (
-    <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+    <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top ">
       <button className="btn btn-link rounded-circle mr-3" onClick={toggleSidebar}>
-      <img src={menuIcon} alt="Toggle Sidebar" width="24" height="24" />
-
+      <img src={menuIcon} alt="Toggle Sidebar" width="30" height="30" />
       </button>
-
-      {/* Otros elementos del navbar */}
     </nav>
   );
 };

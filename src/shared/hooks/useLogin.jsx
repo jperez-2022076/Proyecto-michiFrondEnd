@@ -22,9 +22,20 @@ export const useLogin = () => {
         );
       } else if (response.data) {
         const { token } = response.data;
-        localStorage.setItem('token', token);
-        toast.success(`Bienvenido`);
-        navigate('/Usuarios');
+        localStorage.setItem('token', token); // Guarda el token en el localStorage
+ 
+        const { rol } = response.data.user
+        localStorage.setItem('rol',rol)
+        const {uid} = response.data.user
+        localStorage.setItem('id',uid)
+
+
+        // Redirige según el rol
+        if (rol === 'ADMIN') {
+          navigate('/HistorialPV'); // Redirige a /HistorialPV si es ADMIN
+        } else {
+          navigate('/Guardian'); // Redirige a /Guardian si no es ADMIN
+        }
         success = true;
       }
     } catch (error) {

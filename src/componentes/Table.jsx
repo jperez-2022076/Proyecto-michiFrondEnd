@@ -96,7 +96,7 @@ const ActualizarUsuario = ({ user, onUpdate, onCancel }) => {
       delete updatedUserData.password;
     }
 
-    actualizarUsuario(user._id, updatedUserData, onUpdate); 
+    actualizarUsuario(user._id, updatedUserData, onUpdate);
     onCancel();
   };
 
@@ -246,7 +246,7 @@ const Table = () => {
     listarUsuarios()
       .then((response) => {
         setUsuarios(response.data.users);
-    
+
       })
       .catch((error) => {
         console.error('Error fetching users:', error);
@@ -266,8 +266,12 @@ const Table = () => {
         language: {
           lengthMenu: 'Mostrar <span class="custom-select-container">_MENU_</span> cantidad de registros',
           info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
-        }
+          infoFiltered: '(filtrado de _MAX_ registros en total)', 
+          search: 'Buscar:',
+        },
+      
       });
+      
     }
   }, [usuarios]);
 
@@ -331,14 +335,19 @@ const Table = () => {
               </div>
             ) : (
               <>
-                <div className="card-header py-3 d-flex justify-content-between align-items-center">
+                <center>
+                  <div className="card-header ">
+                    <h3>Usuarios</h3>
+                  </div>
+                </center>
+                <div className="py-3 d-flex justify-content-between align-items-center">
                   <button className="btn btn-primary" onClick={() => toggleForm('add')}>
                     Agregar
                   </button>
                 </div>
                 <div className="card-body">
                   <div className="table-responsive">
-                  <table ref={dataTableRef} className="table table-bordered" width="100%" cellSpacing="0">
+                    <table ref={dataTableRef} className="table table-bordered" width="100%" cellSpacing="0">
                       <thead>
                         <tr>
                           <th>Usuario</th>
@@ -364,9 +373,7 @@ const Table = () => {
                               <button className="icon-wrapper icon-delete mr-2" onClick={() => toggleForm('delete', usuario)}>
                                 <FontAwesomeIcon icon={faTrash} />
                               </button>
-                              <button className="icon-wrapper icon-history mr-2">
-                                <FontAwesomeIcon icon={faHistory} />
-                              </button>
+
                             </td>
                           </tr>
                         ))}

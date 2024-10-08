@@ -5,6 +5,16 @@ const apiClient = axios.create({
   baseURL: 'https://proyecto-michi.vercel.app',
   timeout: 5000,
 });
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.token = token;
+    }
+    return config;
+  },
+  (err) => Promise.reject(err),
+);
 
 export const loginRequest = async (data) => {
   try {
@@ -110,6 +120,16 @@ export const eliminarPersonas = async(id)=>{
     }
   }
 }
+export const buscarPersonaNombre = async(nombre) =>{
+  try {
+    return await apiClient.post(`https://proyecto-michi.vercel.app/persona/buscar`,nombre)
+  } catch (err) {
+    return {
+      error: true,
+      err,
+    }
+  }
+}
 
 
 
@@ -157,4 +177,63 @@ export const eliminarVehiculos = async(id)=>{
     }
   }
 }
+
+export const buscarVehiculoPlaca = async(placa) =>{
+  try {
+    return await apiClient.post(`https://proyecto-michi.vercel.app/vehiculo/buscar`,placa)
+  } catch (err) {
+    return {
+      error: true,
+      err,
+    }
+  }
+}
+
+export const listarHistorialP = async(fechas) => {
+  try {
+    return await apiClient.post(`https://proyecto-michi.vercel.app/historialP/lista`, fechas)
+  } catch (err) {
+    return{
+      error: true,
+      err,
+    }
+  }  
+}
+
+export const agregarHistorialP = async(data)=>{
+  try {
+    return await apiClient.post(`https://proyecto-michi.vercel.app/historialP/agregar`, data)
+  } catch (err) {
+    return {
+      error: true,
+      err
+    }
+  }
+}
+
+
+
+export const listaHistorialPV = async(fechas)=>{
+  try {
+    return await apiClient.post(`https://proyecto-michi.vercel.app/historialPV/listar`,fechas)
+  } catch (err) {
+    return {
+      error: true,
+      err,
+    }
+    
+  }
+}
+
+export const agregarHistorialPV = async(data)=>{
+  try {
+    return await apiClient.post(`https://proyecto-michi.vercel.app/historialPV/agregar`,data)
+  } catch (err) {
+    return {
+      error:true,
+      err,
+    }
+  }
+}
+
 

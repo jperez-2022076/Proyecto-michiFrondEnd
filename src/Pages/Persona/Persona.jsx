@@ -334,6 +334,8 @@ const Personas = () => {
         language: {
           lengthMenu: 'Mostrar <span class="custom-select-container">_MENU_</span> cantidad de registros',
           info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+          infoFiltered: '(filtrado de _MAX_ registros en total)', 
+          search: 'Buscar:',
         }
       });
 
@@ -389,7 +391,13 @@ const Personas = () => {
               </div>
             ) : (
               <>
-                <div className="card-header py-3 d-flex justify-content-between align-items-center">
+                <center>
+                  <div className="card-header ">
+                    <h3>Personas</h3>
+                  </div>
+
+                </center>
+                <div className=" py-3 d-flex justify-content-between align-items-center">
                   <button className="btn btn-primary" onClick={() => toggleForm('add')}>
                     Agregar
                   </button>

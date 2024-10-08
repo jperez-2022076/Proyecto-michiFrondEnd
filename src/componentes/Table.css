@@ -61,3 +61,83 @@
 
 
 
+.custom-datepicker {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Estilo general del DatePicker */
+.react-datepicker {
+  font-family: 'Roboto', sans-serif; /* Consistencia con la fuente de tu aplicación */
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important; /* Sombra suave */
+  border: 1px solid #d9e3f0;
+}
+
+/* Header del calendario */
+.react-datepicker__header {
+  background: linear-gradient(180deg, #4e73df 10%, #224abe 100%); /* Azul oscuro */
+  border-bottom: none;
+  color: white ;
+  padding: 10px;
+  font-size: 1.1rem;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+.react-datepicker__current-month {
+  color: white !important; /* Color blanco para el mes y año */
+  font-weight: bold ; /* Opcional: para hacerlo más destacado */
+}
+.react-datepicker__day-name {
+  color: white !important; /* Color blanco para los nombres de los días */
+  font-weight: bold; /* Opcional: para hacerlos más destacados */
+}
+
+/* Días del calendario */
+.react-datepicker__day {
+  color: #007bff; /* Azul intermedio */
+  font-weight: bold;
+}
+
+/* Día seleccionado */
+.react-datepicker__day--selected {
+  background-color: #0056b3; /* Azul oscuro */
+  color: white;
+}
+
+/* Día al pasar el cursor */
+.react-datepicker__day:hover {
+  background-color: #007bff; /* Azul intermedio */
+  color: white;
+}
+
+/* Borde de fechas seleccionadas */
+.react-datepicker__day--in-range {
+  background-color: rgba(0, 123, 255, 0.2); /* Azul claro transparente */
+  color: #0056b3;
+}
+
+.react-datepicker__day--in-range:hover {
+  background-color: rgba(0, 123, 255, 0.4); /* Aumentar transparencia al pasar el cursor */
+}
+
+/* Botones de navegación (flechas) */
+.react-datepicker__navigation--previous,
+.react-datepicker__navigation--next {
+  top: 10px;
+  border: none;
+  background: none;
+}
+
+.react-datepicker__navigation--previous .react-datepicker__navigation-icon::before,
+.react-datepicker__navigation--next .react-datepicker__navigation-icon::before {
+  border-color: white;
+}
+
+/* Fondo de los meses y días */
+.react-datepicker__month-container {
+  background-color: white; /* Fondo limpio y simple */
+}
+

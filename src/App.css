@@ -6,7 +6,7 @@
   max-height: 100%;
 }
 .bg-gradient-primary {
-  height: 100vh; /* Asegúrate de que el fondo cubra toda la altura del viewport */
+
   display: flex;
   align-items: center;
   justify-content: center;
