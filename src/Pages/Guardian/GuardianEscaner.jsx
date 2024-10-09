@@ -24,7 +24,7 @@ const GuardianEscaner = () => {
     // Establece un nuevo temporizador para actualizar el estado después de un pequeño retraso
     const newTimeoutId = setTimeout(() => {
       console.log('Datos recibidos del escáner:', data); // Muestra los datos escaneados en la consola
-      setScannedData(data); // Actualiza el estado con el nuevo dato escaneado
+      setScannedData(data.split('').reverse().join('')); // Invierte los datos antes de actualizar el estado
       e.target.value = ''; // Limpia el input oculto después de procesar los datos
       setInputValue(''); // Limpia el estado del valor del input
     }, 300); // Espera 300ms antes de procesar el dato
@@ -51,9 +51,10 @@ const GuardianEscaner = () => {
           <input
             type="text"
             ref={hiddenInputRef}
-            style={{ position: 'absolute', left: '-9999px' }} // Oculto visualmente
+            style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', opacity: 0 }} // Oculto visualmente pero accesible
             value={inputValue} // Maneja el valor del input a través del estado
             onChange={handleHiddenInputChange} // Captura el valor escaneado
+            autoFocus // Asegúrate de que el input esté en foco
           />
           <h3>Escanea un código...</h3>
           <p>Datos escaneados: <strong>{scannedData}</strong></p> {/* Muestra los datos escaneados en una línea */}

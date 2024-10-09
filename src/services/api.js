@@ -131,6 +131,17 @@ export const buscarPersonaNombre = async(nombre) =>{
   }
 }
 
+export const buscarPersonaId = async(id) =>{
+  try {
+    return await apiClient.get(`https://proyecto-michi.vercel.app/persona/buscarId/${id}`)
+  } catch (err) {
+    return {
+      error: true,
+      err,
+    }
+  }
+}
+
 
 
 export const listarVehiculo = async() =>{
@@ -188,6 +199,18 @@ export const buscarVehiculoPlaca = async(placa) =>{
     }
   }
 }
+
+export const buscarVehiculoId = async(id) =>{
+  try {
+    return await apiClient.get(`https://proyecto-michi.vercel.app/vehiculo/buscarId/${id}`)
+  } catch (err) {
+    return {
+      error: true,
+      err,
+    }
+  }
+}
+
 
 export const listarHistorialP = async(fechas) => {
   try {
