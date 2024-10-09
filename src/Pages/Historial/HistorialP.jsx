@@ -189,7 +189,7 @@ const HistorialP = () => {
                         </td>
                         <td>{item.estado === 'E' ? 'Entró' : 'Salió'}</td>
                         <td>{item.usuario.nombre}</td>
-                        <td>{format(addDays(parseISO(item.fecha), 1), 'dd/MM/yyyy')}</td> {/* Suma un día aquí */}
+                        <td>{format(parseISO(item.fecha), 'dd/MM/yyyy')}</td>
                         <td>{item.hora}</td>
                       </tr>
                     ))}

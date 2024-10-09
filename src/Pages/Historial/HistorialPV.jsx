@@ -212,13 +212,13 @@ const HistorialPV = () => {
                             // Sumar un día a la fecha
                             (() => {
                               const fecha = new Date(item.fecha);
-                              fecha.setDate(fecha.getDate() + 1); // Sumar un día
+                              fecha.setDate(fecha.getDate() ); // Sumar un día
                               return fecha.toLocaleDateString('es-ES'); // Formatear a fecha en español
                             })()
                           }
                         </td>
                         <td>{item.usuario.nombre}</td>
-                        <td>{new Date(item.fecha).toLocaleDateString()}</td>
+                        <td>{format(parseISO(item.fecha), 'dd/MM/yyyy')}</td>
                         <td>{item.hora}</td>
 
                       </tr>
