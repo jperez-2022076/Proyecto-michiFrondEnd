@@ -6,6 +6,7 @@ import './guardian.css';
 import useBuscarPersonaId from '../../shared/hooks/Persona/PersonaBuscarId';
 import useBuscarVehiculoId from '../../shared/hooks/Vehiculo/VehiculoBuscarId';
 import { useAgregarHistorialP } from '../../shared/hooks/HistorialP/HistorialPAgregar';
+import { useAgregarHistorialPV } from '../../shared/hooks/HistorialP/HistorialPVAgregar'; // Importar hook para historial PV
 import moment from 'moment';
 
 const GuardianEscaner = () => {
@@ -18,11 +19,14 @@ const GuardianEscaner = () => {
   const [isPersonFound, setIsPersonFound] = useState(false);
   const [scannedVehiculoId, setScannedVehiculoId] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [showGuestForm, setShowGuestForm] = useState(false); // Para controlar la visibilidad del formulario de invitado
+  const [guestData, setGuestData] = useState({ nombre: '', dpi: '', placa: '' }); // Datos del invitado
 
-  // Obtener datos de persona y vehículo
   const { data: persona, loading: loadingPersona, error: errorPersona, isSuccess: isPersonSuccess } = useBuscarPersonaId(scannedId);
   const { data: vehiculo, loading: loadingVehiculo, error: errorVehiculo } = useBuscarVehiculoId(scannedVehiculoId);
+  
   const { addHistorial, isLoading: isSavingHistorial } = useAgregarHistorialP();
+  const { addHistorialPV, isLoading: isSavingHistorialPV } = useAgregarHistorialPV(); // Hook para historial PV
 
   const handleHiddenInputChange = (e) => {
     const data = e.target.value;
@@ -34,8 +38,13 @@ const GuardianEscaner = () => {
 
     const newTimeoutId = setTimeout(() => {
       const id = isMobile ? data.split('').reverse().join('') : data;
-
-      if (!isPersonFound) {
+      console.log(id)
+      if (id === 'Invitado') {
+        setShowGuestForm(true); // Mostrar el formulario para invitados
+        setShowButtons(false);
+        e.target.value = '';
+        setInputValue('');
+      } else if (!isPersonFound) {
         setScannedId(id);
       } else {
         setScannedVehiculoId(id);
@@ -50,51 +59,98 @@ const GuardianEscaner = () => {
   };
 
   const handleSaveHistorial = async () => {
-    if (!persona) {
-      toast.error('No se ha encontrado ninguna persona escaneada.');
-      return;
-    }
-
     const usuarioId = localStorage.getItem('id');
     const fechaActual = moment().toISOString();
     const horaActual = moment().format('HH:mm:ss');
-
-    const data = {
-      persona: persona._id,
-      usuario: usuarioId,
-      fecha: fechaActual,
-      hora: horaActual
-    };
-
-    const response = await addHistorial(data);
-
-    if (!response.error) {
-      toast.success('Historial de persona guardado exitosamente.');
-      handleReset(); // Resetea el estado después de guardar
+  
+    if (showGuestForm) {
+      // Guardar la información del invitado
+      const dataHistorialPV = {
+        nombre: guestData.nombre,
+        DPI: guestData.dpi,
+        placa: guestData.placa,
+        usuario: usuarioId,
+        fecha: fechaActual,
+        hora: horaActual
+      };
+     
+      const response = await addHistorialPV(dataHistorialPV);
+  
+      if (!response.error) {
+        toast.success('Historial de invitado agregado exitosamente.');
+        handleReset(); // Reiniciar el formulario después de agregar
+      } else {
+        toast.error('Error al guardar el historial de invitado.');
+      }
+    } else if (isPersonFound && persona) {
+      // Si se encontró una persona y no se escaneó un vehículo, guardar en historialP
+      if (!scannedVehiculoId) {
+        const dataHistorialP = {
+          persona: persona._id,
+          usuario: usuarioId,
+          fecha: fechaActual,
+          hora: horaActual
+        };
+  
+        const response = await addHistorial(dataHistorialP);
+  
+        if (!response.error) {
+          toast.success('Historial de persona agregado exitosamente.');
+          handleReset();
+        } else {
+          toast.error('Error al guardar el historial de persona.');
+        }
+      }
+  
+      // Si se escaneó un vehículo, guardar solo en historialPV
+      if (scannedVehiculoId) {
+        const dataHistorialPV = {
+          persona: persona._id,
+          vehiculo: scannedVehiculoId,
+          usuario: usuarioId,
+          fecha: fechaActual,
+          hora: horaActual
+        };
+  
+        const vehicleResponse = await addHistorialPV(dataHistorialPV);
+  
+        if (!vehicleResponse.error) {
+          toast.success('Historial de vehículo agregado exitosamente.');
+          handleReset(); // Reiniciar el formulario después de agregar
+        } else {
+          toast.error('Error al guardar el historial de vehículo.');
+        }
+      }
     } else {
-      toast.error('Error al guardar el historial.');
+      toast.error('No se ha encontrado una persona.');
     }
   };
-
+  
   const handleCancel = () => {
     handleReset(); // Resetea el estado al cancelar
   };
 
   const handleReset = () => {
-    // Reiniciar todos los estados
     setScannedId(null);
     setScannedVehiculoId(null);
     setShowButtons(false);
     setInputValue('');
     setIsPersonFound(false);
+    setShowGuestForm(false); // Oculta el formulario al reiniciar
+    setGuestData({ nombre: '', dpi: '', placa: '' }); // Resetear datos del invitado
     hiddenInputRef.current.value = '';
     hiddenInputRef.current.focus();
   };
 
+  const handleGuestInputChange = (e) => {
+    const { name, value } = e.target;
+    setGuestData({ ...guestData, [name]: value });
+  };
+
   useEffect(() => {
     if (isPersonSuccess) {
-      setIsPersonFound(true); // Marca que ya se encontró a la persona
-      console.log('Persona encontrada:', persona); // Mostrar la persona en la consola
+      setIsPersonFound(true);
+      setShowGuestForm(false); // Ocultar formulario si se encuentra a la persona
     }
   }, [isPersonSuccess, persona]);
 
@@ -151,53 +207,89 @@ const GuardianEscaner = () => {
           <h3>Escanea un código...</h3>
 
           {loadingPersona && <p>Cargando información de la persona...</p>}
+          
+          {showGuestForm && (
+            <div className="card mt-5" style={{ width: '98%' }}>
+              <div className="card-body">
+                <h5>Información del Invitado</h5>
+                <div className="form-group">
+                  <label htmlFor="nombre">Nombre</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="nombre"
+                    name="nombre"
+                    value={guestData.nombre}
+                    onChange={handleGuestInputChange}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="dpi">DPI</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="dpi"
+                    name="dpi"
+                    value={guestData.dpi}
+                    onChange={handleGuestInputChange}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="placa">Placa</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="placa"
+                    name="placa"
+                    value={guestData.placa}
+                    onChange={handleGuestInputChange}
+                    required
+                  />
+                </div>
+                <div className="d-flex justify-content-end">
+                  <button className="btn btn-success mr-2" onClick={handleSaveHistorial} disabled={isSavingHistorial || isSavingHistorialPV}>
+                    {isSavingHistorial || isSavingHistorialPV ? 'Guardando...' : 'Guardar'}
+                  </button>
+                  <button className="btn btn-danger" onClick={handleCancel}>
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {isPersonFound && persona && (
-  <div className="card mt-5" style={scannedVehiculoId ? { width: '98%', height: '15%' } : { width: '98%', height: 'auto' }}>
-    <div 
-      className={scannedVehiculoId 
-        ? 'card-body d-flex align-items-center justify-content-between' 
-        : 'card-body d-flex flex-column align-items-center'} 
-      style={{ height: '100%' }}
-    >
-      <div className={`${scannedVehiculoId ? 'text-left' : 'text-center'}`}>
-        <h5 className="card-title mb-0">{persona.nombre}</h5>
-        <h6 className="mt-2">DPI: {persona.DPI}</h6>
-      </div>
+            <div className="card mt-5" style={scannedVehiculoId ? { width: '98%', height: '15%' } : { width: '98%', height: 'auto' }}>
+              <div className={scannedVehiculoId ? 'card-body d-flex align-items-center justify-content-between' : 'card-body d-flex flex-column align-items-center'} style={{ height: '100%' }}>
+                <div className={`${scannedVehiculoId ? 'text-left' : 'text-center'}`}>
+                  <h5 className="card-title mb-0">{persona.nombre}</h5>
+                  <h6 className="mt-2">DPI: {persona.DPI}</h6>
+                </div>
+                {scannedVehiculoId ? (
+                  <div className="text-right">
+                    <img
+                      className="imagen"
+                      src={persona.fotoP || 'Sin foto'}
+                      alt="Persona"
+                      style={{ width: '80px', height: '80px', objectFit: 'cover' }}
+                    />
+                  </div>
+                ) : (
+                  <div className="mt-3">
+                    <img
+                      className="image_n"
+                      src={persona.fotoP || 'Sin foto'}
+                      alt="Persona"
+                      style={{ width: '150px', height: '150px', objectFit: 'cover' }}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
-      {/* Si no hay vehículo, centramos la imagen debajo del nombre y DPI */}
-      {scannedVehiculoId ? (
-        <div className="text-right">
-          <img 
-            className="imagen" 
-            src={persona.fotoP || 'Sin foto'} 
-            alt="Persona" 
-            style={{ 
-              width: '80px', 
-              height: '80px', 
-              objectFit: 'cover' 
-            }} 
-          />
-        </div>
-      ) : (
-        <div className="mt-3">
-          <img 
-            className="image_n" 
-            src={persona.fotoP || 'Sin foto'} 
-            alt="Persona" 
-            style={{ 
-              width: '150px', 
-              height: '150px', 
-              objectFit: 'cover' 
-            }} 
-          />
-        </div>
-      )}
-    </div>
-  </div>
-)}
-
-
-          {/* Verifica si hay un vehículo escaneado antes de mostrarlo */}
           {isPersonFound && scannedVehiculoId && vehiculo && (
             <div className="card card-persona mt-5">
               <div className="card-body d-flex flex-column align-items-center">
@@ -207,12 +299,14 @@ const GuardianEscaner = () => {
             </div>
           )}
 
-          {isPersonFound && showButtons && (
+          {isPersonFound && showButtons && !showGuestForm && (
             <div className="d-flex mt-3" style={{ position: 'absolute', bottom: '20px', left: '50%', transform: 'translateX(-50%)' }}>
-              <button className="btn btn-success mr-2" onClick={handleSaveHistorial} disabled={isSavingHistorial}>
-                {isSavingHistorial ? 'Guardando...' : 'Guardar'}
+              <button className="btn btn-success mr-2" onClick={handleSaveHistorial} disabled={isSavingHistorial || isSavingHistorialPV}>
+                {isSavingHistorial || isSavingHistorialPV ? 'Guardando...' : 'Guardar'}
               </button>
-              <button className="btn btn-danger" onClick={handleCancel}>Cancelar</button>
+              <button className="btn btn-danger" onClick={handleCancel}>
+                Cancelar
+              </button>
             </div>
           )}
         </div>

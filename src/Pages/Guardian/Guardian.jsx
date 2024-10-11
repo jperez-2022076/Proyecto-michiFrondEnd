@@ -84,7 +84,7 @@ const Guardian = () => {
 
   const handleSave = async () => {
     const usuarioId = localStorage.getItem('id'); // Obtén el ID del usuario del localStorage
-    const fechaActual = moment().subtract(1, 'days').toISOString(); // Formato ISO 8601
+    const fechaActual = moment().toISOString(); // Formato ISO 8601
     const horaActual = moment().format('HH:mm:ss'); // Formato 24 horas
 
     if (addedCards.length === 2) {

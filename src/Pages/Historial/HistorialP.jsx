@@ -181,7 +181,7 @@ const HistorialP = () => {
                             <img
                               src={item.persona.fotoP}
                               alt="Foto de la persona"
-                              style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                              style={{ width: '60px', height: '60px', objectFit: 'cover' }}
                             />
                           ) : (
                             'Sin foto'
