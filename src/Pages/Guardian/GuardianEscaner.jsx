@@ -4,19 +4,24 @@ import Sidebar from '../../componentes/Sidebar';
 import Navbar from '../../componentes/Navbar';
 import './guardian.css';
 import useBuscarPersonaId from '../../shared/hooks/Persona/PersonaBuscarId';
+import useBuscarVehiculoId from '../../shared/hooks/Vehiculo/VehiculoBuscarId';
 import { useAgregarHistorialP } from '../../shared/hooks/HistorialP/HistorialPAgregar';
 import moment from 'moment';
 
 const GuardianEscaner = () => {
   const hiddenInputRef = useRef(null);
   const [isSidebarVisible, setSidebarVisible] = useState(false);
-  const [scannedData, setScannedData] = useState('');
   const [inputValue, setInputValue] = useState('');
   const [timeoutId, setTimeoutId] = useState(null);
   const [scannedId, setScannedId] = useState(null);
-  const [showButtons, setShowButtons] = useState(false); // Mostrar los botones de Guardar/Cancelar
+  const [showButtons, setShowButtons] = useState(false);
+  const [isPersonFound, setIsPersonFound] = useState(false);
+  const [scannedVehiculoId, setScannedVehiculoId] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
 
-  const { data: persona, loading, error } = useBuscarPersonaId(scannedId);
+  // Obtener datos de persona y vehículo
+  const { data: persona, loading: loadingPersona, error: errorPersona, isSuccess: isPersonSuccess } = useBuscarPersonaId(scannedId);
+  const { data: vehiculo, loading: loadingVehiculo, error: errorVehiculo } = useBuscarVehiculoId(scannedVehiculoId);
   const { addHistorial, isLoading: isSavingHistorial } = useAgregarHistorialP();
 
   const handleHiddenInputChange = (e) => {
@@ -28,10 +33,15 @@ const GuardianEscaner = () => {
     }
 
     const newTimeoutId = setTimeout(() => {
-      console.log('Datos recibidos del escáner:', data);
-      setScannedData(data);
-      setScannedId(data.split('').reverse().join('')); // Invierte el ID como indicaste
-      setShowButtons(true); // Mostrar los botones al escanear algo
+      const id = isMobile ? data.split('').reverse().join('') : data;
+
+      if (!isPersonFound) {
+        setScannedId(id);
+      } else {
+        setScannedVehiculoId(id);
+      }
+
+      setShowButtons(true);
       e.target.value = '';
       setInputValue('');
     }, 300);
@@ -49,35 +59,53 @@ const GuardianEscaner = () => {
     const fechaActual = moment().toISOString();
     const horaActual = moment().format('HH:mm:ss');
 
-    const data = { 
-      persona: persona._id, 
-      usuario: usuarioId, 
-      fecha: fechaActual, 
-      hora: horaActual 
+    const data = {
+      persona: persona._id,
+      usuario: usuarioId,
+      fecha: fechaActual,
+      hora: horaActual
     };
 
     const response = await addHistorial(data);
 
     if (!response.error) {
       toast.success('Historial de persona guardado exitosamente.');
-      handleCancel(); // Resetea el estado después de guardar
-      hiddenInputRef.current.focus(); // Enfoca el input después de guardar
+      handleReset(); // Resetea el estado después de guardar
     } else {
       toast.error('Error al guardar el historial.');
     }
-};
+  };
 
-const handleCancel = () => {
-    setScannedData('');  // Limpia los datos escaneados
-    setScannedId(null);  // Limpia el ID escaneado
-    setShowButtons(false);  // Oculta los botones al cancelar
-    setInputValue('');  // Limpia el valor del input
-    hiddenInputRef.current.value = '';  // Limpia el campo oculto
-    hiddenInputRef.current.focus(); // Enfoca el input después de cancelar
-};
+  const handleCancel = () => {
+    handleReset(); // Resetea el estado al cancelar
+  };
 
+  const handleReset = () => {
+    // Reiniciar todos los estados
+    setScannedId(null);
+    setScannedVehiculoId(null);
+    setShowButtons(false);
+    setInputValue('');
+    setIsPersonFound(false);
+    hiddenInputRef.current.value = '';
+    hiddenInputRef.current.focus();
+  };
 
   useEffect(() => {
+    if (isPersonSuccess) {
+      setIsPersonFound(true); // Marca que ya se encontró a la persona
+      console.log('Persona encontrada:', persona); // Mostrar la persona en la consola
+    }
+  }, [isPersonSuccess, persona]);
+
+  useEffect(() => {
+    hiddenInputRef.current.focus();
+  }, []);
+
+  useEffect(() => {
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const isMobileDevice = /android|iPad|iPhone|iPod/.test(userAgent.toLowerCase());
+    setIsMobile(isMobileDevice);
     hiddenInputRef.current.focus();
   }, []);
 
@@ -85,13 +113,25 @@ const handleCancel = () => {
     const handleTouchStart = () => {
       hiddenInputRef.current.focus();
     };
-  
+
     document.addEventListener('touchstart', handleTouchStart);
-  
+
     return () => {
       document.removeEventListener('touchstart', handleTouchStart);
     };
   }, []);
+
+  useEffect(() => {
+    if (errorPersona) {
+      toast.error('Error al buscar persona.');
+    }
+  }, [errorPersona]);
+
+  useEffect(() => {
+    if (errorVehiculo) {
+      toast.error('Error al buscar vehículo.');
+    }
+  }, [errorVehiculo]);
 
   return (
     <div id="wrapper" className={isSidebarVisible ? 'toggled' : ''}>
@@ -109,26 +149,65 @@ const handleCancel = () => {
             autoFocus
           />
           <h3>Escanea un código...</h3>
-          <p>Datos escaneados: <strong>{scannedData}</strong></p>
 
-          {loading && <p>Cargando información de la persona...</p>}
-          {error && <p>Error al buscar persona: {error}</p>}
-          {persona && scannedId && (
+          {loadingPersona && <p>Cargando información de la persona...</p>}
+          {isPersonFound && persona && (
+  <div className="card mt-5" style={scannedVehiculoId ? { width: '98%', height: '15%' } : { width: '98%', height: 'auto' }}>
+    <div 
+      className={scannedVehiculoId 
+        ? 'card-body d-flex align-items-center justify-content-between' 
+        : 'card-body d-flex flex-column align-items-center'} 
+      style={{ height: '100%' }}
+    >
+      <div className={`${scannedVehiculoId ? 'text-left' : 'text-center'}`}>
+        <h5 className="card-title mb-0">{persona.nombre}</h5>
+        <h6 className="mt-2">DPI: {persona.DPI}</h6>
+      </div>
+
+      {/* Si no hay vehículo, centramos la imagen debajo del nombre y DPI */}
+      {scannedVehiculoId ? (
+        <div className="text-right">
+          <img 
+            className="imagen" 
+            src={persona.fotoP || 'Sin foto'} 
+            alt="Persona" 
+            style={{ 
+              width: '80px', 
+              height: '80px', 
+              objectFit: 'cover' 
+            }} 
+          />
+        </div>
+      ) : (
+        <div className="mt-3">
+          <img 
+            className="image_n" 
+            src={persona.fotoP || 'Sin foto'} 
+            alt="Persona" 
+            style={{ 
+              width: '150px', 
+              height: '150px', 
+              objectFit: 'cover' 
+            }} 
+          />
+        </div>
+      )}
+    </div>
+  </div>
+)}
+
+
+          {/* Verifica si hay un vehículo escaneado antes de mostrarlo */}
+          {isPersonFound && scannedVehiculoId && vehiculo && (
             <div className="card card-persona mt-5">
               <div className="card-body d-flex flex-column align-items-center">
-                <h4 className="card-title">{persona.nombre}</h4>
-                <p>DPI: {persona.DPI}</p>
-                <img
-                  className="persona-image"
-                  src={persona.fotoP || 'Sin foto'}
-                  alt="Persona"
-                  style={{ width: '200px', height: '250px', objectFit: 'cover' }}
-                />
+                <h4 className="card-title">Placa: {vehiculo.placa}</h4>
+                <img className="persona-image" src={vehiculo.fotoV || 'Sin foto'} alt="Vehículo" style={{ width: '200px', height: '250px', objectFit: 'cover' }} />
               </div>
             </div>
           )}
 
-          {showButtons && (
+          {isPersonFound && showButtons && (
             <div className="d-flex mt-3" style={{ position: 'absolute', bottom: '20px', left: '50%', transform: 'translateX(-50%)' }}>
               <button className="btn btn-success mr-2" onClick={handleSaveHistorial} disabled={isSavingHistorial}>
                 {isSavingHistorial ? 'Guardando...' : 'Guardar'}
