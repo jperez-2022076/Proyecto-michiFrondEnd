@@ -28,18 +28,31 @@ const GuardianEscaner = () => {
   const { addHistorial, isLoading: isSavingHistorial } = useAgregarHistorialP();
   const { addHistorialPV, isLoading: isSavingHistorialPV } = useAgregarHistorialPV(); // Hook para historial PV
 
+
   const handleHiddenInputChange = (e) => {
     const data = e.target.value;
     setInputValue(data);
-
+  
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
-
+  
     const newTimeoutId = setTimeout(() => {
       const id = isMobile ? data.split('').reverse().join('') : data;
-      console.log(id)
-      if (id === 'Invitado') {
+  
+      // Cambiar la condición para usar startsWith
+      if (id.startsWith('Invitado')) {
+        setScannedId(id);
+        
+        // Recuperar información del invitado si ya existe
+        const storedGuestData = JSON.parse(localStorage.getItem(id));
+        if (storedGuestData) {
+          setGuestData(storedGuestData);
+          localStorage.removeItem(id);
+        } else {
+          setGuestData({ nombre: '', dpi: '', placa: '' }); // Reiniciar los datos si no existen
+        }
+        
         setShowGuestForm(true); // Mostrar el formulario para invitados
         setShowButtons(false);
         e.target.value = '';
@@ -49,20 +62,20 @@ const GuardianEscaner = () => {
       } else {
         setScannedVehiculoId(id);
       }
-
+  
       setShowButtons(true);
       e.target.value = '';
       setInputValue('');
     }, 300);
-
+  
     setTimeoutId(newTimeoutId);
   };
-
+  
   const handleSaveHistorial = async () => {
     const usuarioId = localStorage.getItem('id');
     const fechaActual = moment().toISOString();
     const horaActual = moment().format('HH:mm:ss');
-  
+    
     if (showGuestForm) {
       // Guardar la información del invitado
       const dataHistorialPV = {
@@ -73,7 +86,10 @@ const GuardianEscaner = () => {
         fecha: fechaActual,
         hora: horaActual
       };
-     
+  
+      // Guardar también en localStorage
+      localStorage.setItem(scannedId, JSON.stringify(guestData));
+  
       const response = await addHistorialPV(dataHistorialPV);
   
       if (!response.error) {
@@ -125,7 +141,7 @@ const GuardianEscaner = () => {
       toast.error('No se ha encontrado una persona.');
     }
   };
-  
+
   const handleCancel = () => {
     handleReset(); // Resetea el estado al cancelar
   };
