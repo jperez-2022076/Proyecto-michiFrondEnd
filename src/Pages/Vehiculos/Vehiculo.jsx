@@ -15,6 +15,8 @@ import InputMask from 'react-input-mask';
 import axios from 'axios';
 import useActualizarVehiculo from '../../shared/hooks/Vehiculo/VehiculoActualizar';
 import useEliminarVehiculo from '../../shared/hooks/Vehiculo/VehiculoEliminar';
+import useListarHistorialVehiculo from '../../shared/hooks/Vehiculo/VehiculoHistorial';
+import { format } from 'date-fns';
 
 
 import { Dropdown } from 'react-bootstrap';
@@ -311,6 +313,123 @@ const EliminarVehiculo = ({ vehiculo, onDelete, onCancel }) => {
   };
 
 
+  const HistorialVehiculo = ({ vehiculoId, onCancel }) => {
+    const { obtenerHistorialVehiculo, loading, error, historial } = useListarHistorialVehiculo();
+    const dataTableRef = useRef(null);
+    const [fetchError, setFetchError] = useState(null); // Estado para manejar errores
+  
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          await obtenerHistorialVehiculo(vehiculoId);
+          setFetchError(null); // Resetea el error si la llamada es exitosa
+        } catch (err) {
+          setFetchError(err.message || 'Error al obtener el historial'); // Maneja el error aquí
+        }
+      };
+      fetchData();
+    }, [vehiculoId]); // Dependencia en vehiculoId
+  
+    // Verifica si hay un error y muestra el mensaje
+    if (fetchError) {
+      return (
+        <>
+          <h5>Historial del vehículo</h5>
+          <button className="btn btn-secondary mt-3" onClick={onCancel}>
+            Cerrar Historial
+          </button>
+          <br />
+          <div className="card-body">
+            <p>Error: {fetchError}</p>
+          </div>
+        </>
+      );
+    }
+  
+    // Inicializar DataTable al obtener historial
+    useEffect(() => {
+      if (historial && historial.length > 0) {
+        if ($.fn.dataTable.isDataTable(dataTableRef.current)) {
+          $(dataTableRef.current).DataTable().destroy(); // Destruir instancia previa para evitar duplicados
+        }
+        $(dataTableRef.current).DataTable({
+          language: {
+            lengthMenu: 'Mostrar <span class="custom-select-container">_MENU_</span> registros por página',
+            info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+            infoFiltered: '(filtrado de _MAX_ registros en total)',
+            search: 'Buscar:',
+          },
+          order: [[4, 'desc'], [5, 'desc']], // Ordenar por fecha y hora
+        });
+      }
+    }, [historial]);
+  
+    return (
+      <>
+        <h5>Historial del vehículo</h5>
+        <button className="btn btn-secondary mt-3" onClick={onCancel}>
+          Cerrar Historial
+        </button>
+        <br />
+        <div className="card-body">
+          {loading && <p>Cargando historial...</p>}
+          {historial && historial.length > 0 ? (
+            <div className="table-responsive">
+              <table className="table table-bordered" ref={dataTableRef} width="100%" cellSpacing="0">
+              <thead>
+                    <tr>
+                      <th>Nombre de persona</th>
+                      <th>Foto de la persona</th>
+                      <th>Placa</th>
+                      <th>Foto Vehículo</th>
+                      <th>Estado</th>
+                      <th>Usuario</th>
+                      <th>Fecha</th>
+                      <th>Hora</th>
+                    </tr>
+                  </thead>
+                <tbody>
+                  {historial.map((item, index) => (
+                    <tr key={index}>
+                      <td>{item.persona?.nombre || item.nombre}</td>
+                        <td>
+                          {item.persona?.fotoP ? (
+                            <img src={item.persona.fotoP} alt="Foto Persona" style={{ width: '60px', height: '60px', objectFit: 'cover' }} />
+                          ) : (
+                            'Invitado'
+                          )}
+                        </td>
+                        <td>{item.vehiculo?.placa || item.placa}</td>
+                        <td>
+                          {item.vehiculo?.fotoV ? (
+                            <img src={item.vehiculo.fotoV} alt="Foto vehículo" style={{ width: '60px', height: '60px', objectFit: 'cover' }} />
+                          ) : (
+                            'Invitado'
+                          )}
+                        </td>
+                        <td>
+                          {item.estado === 'E' ? 'Entrando' : item.estado === 'S' ? 'Saliendo' : 'Desconocido'}
+                        </td>
+                        <td>{item.usuario?.nombre}</td>
+                        <td>{format(new Date(new Date(item.fecha).toUTCString().slice(0, -3)), 'dd/MM/yyyy')}</td>
+
+                        <td>{item.hora}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p>No hay historial para el vehículo.</p> // Mensaje si no hay historiales
+          )}
+        </div>
+      </>
+    );
+  };
+
+
+
+
 
 
 
@@ -428,6 +547,9 @@ const Vehiculos = () => {
                                 {formMode === 'delete' && selectedVehiculo && (
                                     <EliminarVehiculo    vehiculo={selectedVehiculo} onDelete={handleDelete} onCancel={handleCancel} />
                                 )}
+                                   {formMode === 'history' && selectedVehiculo && (
+            <HistorialVehiculo vehiculoId={selectedVehiculo._id} onCancel={handleCancel} />
+          )}
                             </div>
                         ) : (
                             <>
@@ -504,7 +626,7 @@ const Vehiculos = () => {
                                                             <button className="icon-wrapper icon-delete mr-2" onClick={() => toggleForm('delete', vehiculo)}>
                                                                 <FontAwesomeIcon icon={faTrash} />
                                                             </button>
-                                                            <button className="icon-wrapper icon-history mr-2">
+                                                            <button className="icon-wrapper icon-history mr-2" onClick={() => toggleForm('history', vehiculo)}>
                                                                 <FontAwesomeIcon icon={faHistory} />
                                                             </button>
                                                         </td>

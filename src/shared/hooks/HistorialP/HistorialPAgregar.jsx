@@ -17,8 +17,6 @@ export const useAgregarHistorialP = () => {
     if (response.error) {
         toast.error('No se pudo agregar, intentalo de nuevo')
       setError(response.err); // Maneja el error si hay
-    }else{
-        toast.success('Agregado exitosamente')
     }
 
     setIsLoading(false);

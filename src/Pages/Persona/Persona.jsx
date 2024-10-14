@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import $ from 'jquery';
 import 'datatables.net-bs4';
 import 'datatables.net-bs4/css/dataTables.bootstrap4.min.css';
@@ -10,12 +9,13 @@ import '../../componentes/Table.css';
 import Sidebar from '../../componentes/Sidebar';
 import Navbar from '../../componentes/Navbar';
 import { listarPersonas } from '../../services/api';
-import useAgregarPersona from '../../shared/hooks/Persona/PersonaAgregar'
+import useAgregarPersona from '../../shared/hooks/Persona/PersonaAgregar';
 import InputMask from 'react-input-mask';
 import axios from 'axios';
 import useActualizarPersona from '../../shared/hooks/Persona/PersonaActualizar';
 import useEliminarPersona from '../../shared/hooks/Persona/PersonaEliminar';
-
+import useListarHistorialPersona from '../../shared/hooks/Persona/PersonaHistorial';
+import { format } from 'date-fns';
 import { Dropdown } from 'react-bootstrap';
 
 
@@ -295,13 +295,113 @@ const EliminarPersona = ({ user, onDelete, onCancel }) => {
     </form>
   );
 };
+const HistorialPersona = ({ personaId, onCancel }) => {
+  const { obtenerHistorialPersona, loading, error, historial } = useListarHistorialPersona();
+  const dataTableRef = useRef(null);
+  const [fetchError, setFetchError] = useState(null); // Estado para manejar errores
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await obtenerHistorialPersona(personaId);
+        setFetchError(null); // Resetea el error si la llamada es exitosa
+      } catch (err) {
+        setFetchError(err.message || 'Error al obtener el historial'); // Maneja el error aquí
+      }
+    };
+    fetchData();
+  }, [personaId]); // Dependencia en personaId
+
+  // Verifica si hay un error y muestra el mensaje
+  if (fetchError) {
+    return (
+      <>
+        <h5>Historial de la persona</h5>
+        <button className="btn btn-secondary mt-3" onClick={onCancel}>
+          Cerrar Historial
+        </button>
+        <br />
+        <div className="card-body">
+          <p>Error: {fetchError}</p>
+        </div>
+      </>
+    );
+  }
+
+  // Inicializar DataTable al obtener historial
+  useEffect(() => {
+    if (historial && historial.length > 0) {
+      if ($.fn.dataTable.isDataTable(dataTableRef.current)) {
+        $(dataTableRef.current).DataTable().destroy(); // Destruir instancia previa para evitar duplicados
+      }
+      $(dataTableRef.current).DataTable({
+        language: {
+          lengthMenu: 'Mostrar <span class="custom-select-container">_MENU_</span> registros por página',
+          info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+          infoFiltered: '(filtrado de _MAX_ registros en total)',
+          search: 'Buscar:',
+        },
+        order: [[4, 'desc'], [5, 'desc']], // Ordenar por fecha y hora
+      });
+    }
+  }, [historial]);
+
+  return (
+    <>
+      <h5>Historial de la persona</h5>
+      <button className="btn btn-secondary mt-3" onClick={onCancel}>
+        Cerrar Historial
+      </button>
+      <br />
+      <div className="card-body">
+        {loading && <p>Cargando historial...</p>}
+        {historial && historial.length > 0 ? (
+          <div className="table-responsive">
+            <table className="table table-bordered" ref={dataTableRef} width="100%" cellSpacing="0">
+              <thead>
+                <tr>
+                  <th>Nombre de persona</th>
+                  <th>Foto de la persona</th>
+                  <th>Estado</th>
+                  <th>Usuario</th>
+                  <th>Fecha</th>
+                  <th>Hora</th>
+                </tr>
+              </thead>
+              <tbody>
+                {historial.map((item, index) => (
+                  <tr key={index}>
+                    <td>{item.persona?.nombre || item.nombre}</td>
+                    <td>
+                      {item.persona?.fotoP ? (
+                        <img src={item.persona.fotoP} alt="Foto Persona" style={{ width: '60px', height: '60px', objectFit: 'cover' }} />
+                      ) : (
+                        'Invitado'
+                      )}
+                    </td>
+                    <td>{item.estado === 'E' ? 'Entrando' : item.estado === 'S' ? 'Saliendo' : 'Desconocido'}</td>
+                    <td>{item.usuario?.nombre}</td>
+                    <td>{format(new Date(new Date(item.fecha).toUTCString().slice(0, -3)), 'dd/MM/yyyy')}</td>
+                    <td>{item.hora}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p>No hay historial para la persona.</p> // Mensaje si no hay historiales
+        )}
+      </div>
+    </>
+  );
+};
 
 
 const Personas = () => {
   const [personas, setPersonas] = useState([]);
   const [isSidebarVisible, setSidebarVisible] = useState(true);
   const [isFormVisible, setFormVisible] = useState(false);
-  const [formMode, setFormMode] = useState(null); // null, 'add', 'edit', 'delete'
+  const [formMode, setFormMode] = useState(null); // null, 'add', 'edit', 'delete', 'history'
   const [selectedPersona, setSelectedPersona] = useState(null);
   const dataTableRef = useRef(null);
 
@@ -313,7 +413,6 @@ const Personas = () => {
     listarPersonas()
       .then((response) => {
         setPersonas(response.data);
-
       })
       .catch((error) => {
         console.error('Error fetching users:', error);
@@ -321,7 +420,7 @@ const Personas = () => {
   };
 
   useEffect(() => {
-    refreshPersonaList(); // Load users on component mount
+    refreshPersonaList();
   }, []);
 
   useEffect(() => {
@@ -332,36 +431,24 @@ const Personas = () => {
 
       $(dataTableRef.current).DataTable({
         language: {
-          lengthMenu: 'Mostrar <span class="custom-select-container">_MENU_</span> cantidad de registros',
+          lengthMenu: 'Mostrar <span class="custom-select-container">_MENU_</span> registros por página',
           info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
-          infoFiltered: '(filtrado de _MAX_ registros en total)', 
+          infoFiltered: '(filtrado de _MAX_ registros en total)',
           search: 'Buscar:',
-        }
+        },
       });
-
     }
   }, [personas]);
 
-  const handleDelete = (user) => {
-    console.log('Eliminar Usuario:', user);
-    // Call your API to delete the user here
+  const handleCancel = () => {
     setFormVisible(false);
-    refreshUserList(); // Refresh the user list after deleting
+    refreshPersonaList();
   };
 
   const toggleForm = (mode, user) => {
     setFormMode(mode);
     setSelectedPersona(user);
     setFormVisible(true);
-  };
-
-  // New function for handling cancellation
-  const handleCancel = () => {
-    if ($.fn.dataTable.isDataTable(dataTableRef.current)) {
-      $(dataTableRef.current).DataTable().destroy();
-    }
-    setFormVisible(false);
-    refreshPersonaList(); // Refresh the user list when cancelling
   };
 
   return (
@@ -374,75 +461,65 @@ const Personas = () => {
           <div className="card shadow mb-4">
             {isFormVisible ? (
               <div className="card-body">
-                {formMode === 'add' && (
-                  <AgregarPersona onSuccess={handleCancel} onCancel={handleCancel} />
-                )}
-                {formMode === 'edit' && selectedPersona && (
-                  <ActualizarPersona
-                    user={selectedPersona}
-                    onUpdate={handleCancel}
-                    onCancel={handleCancel}
-                  />
-                )}
-
-                {formMode === 'delete' && selectedPersona && (
-                  <EliminarPersona user={selectedPersona} onDelete={handleDelete} onCancel={handleCancel} />
-                )}
+                {formMode === 'add' && <AgregarPersona onSuccess={handleCancel} onCancel={handleCancel} />}
+                {formMode === 'edit' && selectedPersona && <ActualizarPersona user={selectedPersona} onUpdate={handleCancel} onCancel={handleCancel} />}
+                {formMode === 'delete' && selectedPersona && <EliminarPersona user={selectedPersona} onDelete={handleCancel} onCancel={handleCancel} />}
+                {formMode === 'history' && selectedPersona && <HistorialPersona personaId={selectedPersona._id} onCancel={handleCancel} />}
               </div>
             ) : (
               <>
-                <center>
-                  <div className="card-header ">
-                    <h3>Personas</h3>
-                  </div>
+              <center>
+              <div className="card-header ">
+                <h3>Personas</h3>
+              </div>
 
-                </center>
-                <div className=" py-3 d-flex justify-content-between align-items-center">
-                  <button className="btn btn-primary" onClick={() => toggleForm('add')}>
-                    Agregar
-                  </button>
-                  <div className="dropdown">
-                    <Dropdown>
-                      <Dropdown.Toggle variant="primary" id="dropdown-basic">
-                        Exportar
-                      </Dropdown.Toggle>
+            </center>
+            <div className=" py-3 d-flex justify-content-between align-items-center">
+              <button className="btn btn-primary" onClick={() => toggleForm('add')}>
+                Agregar
+              </button>
+              <div className="dropdown">
+                <Dropdown>
+                  <Dropdown.Toggle variant="primary" id="dropdown-basic">
+                    Exportar
+                  </Dropdown.Toggle>
 
-                      <Dropdown.Menu>
-                        <Dropdown.Item
-                          as="a"
-                          href="https://proyecto-michi.vercel.app/persona/exportar/pdf"
-                          download // Esto indica que es un archivo para descargar
-                        >
-                          <FontAwesomeIcon icon={faFilePdf} className="mr-2" /> Exportar a PDF
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                          as="a"
-                          href="https://proyecto-michi.vercel.app/persona/exportar/excel"
-                          download // Esto indica que es un archivo para descargar
-                        >
-                          <FontAwesomeIcon icon={faFileExcel} className="mr-2" /> Exportar a Excel
-                        </Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </div>
-                </div>
-                <div className="card-body">
-                  <div className="table-responsive">
-                    <table ref={dataTableRef} className="table table-bordered" width="100%" cellSpacing="0">
-                      <thead>
-                        <tr>
-                          <th>Nombre</th>
-                          <th>Teléfono</th>
-                          <th>DPI</th>
-                          <th>Foto</th>
-                          <th>Estado</th>
-                          <th>Opciones</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {personas.map((persona, index) => (
-                          <tr key={index}>
-                            <td>{persona.nombre}</td>
+                  <Dropdown.Menu>
+                    <Dropdown.Item
+                      as="a"
+                      href="https://proyecto-michi.vercel.app/persona/exportar/pdf"
+                      download // Esto indica que es un archivo para descargar
+                    >
+                      <FontAwesomeIcon icon={faFilePdf} className="mr-2" /> Exportar a PDF
+                    </Dropdown.Item>
+                    <Dropdown.Item
+                      as="a"
+                      href="https://proyecto-michi.vercel.app/persona/exportar/excel"
+                      download // Esto indica que es un archivo para descargar
+                    >
+                      <FontAwesomeIcon icon={faFileExcel} className="mr-2" /> Exportar a Excel
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              </div>
+            </div>
+              <div className="card-body">
+                <div className="table-responsive">
+                  <table className="table table-bordered" ref={dataTableRef} width="100%" cellSpacing="0">
+                    <thead>
+                      <tr>
+                        <th>Nombre</th>
+                        <th>Teléfono</th>
+                        <th>DPI</th>
+                        <th>Foto</th>
+                        <th>Estado</th>
+                        <th>Opciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {personas.map((persona, index) => (
+                        <tr key={index}>
+                         <td>{persona.nombre}</td>
                             <td>{persona.telefono}</td>
                             <td>{persona.DPI}</td>
                             <td>
@@ -457,24 +534,23 @@ const Personas = () => {
                               )}
                             </td>
                             <td>{persona.estado ? 'Activo' : 'Inactivo'}</td>
-                            <td className="text-center">
-                              <button className="icon-wrapper icon-edit mr-2" onClick={() => toggleForm('edit', persona)}>
+                          <td>
+                          <button className="icon-wrapper icon-edit mr-2" onClick={() => toggleForm('edit', persona)}>
                                 <FontAwesomeIcon icon={faEdit} />
                               </button>
                               <button className="icon-wrapper icon-delete mr-2" onClick={() => toggleForm('delete', persona)}>
                                 <FontAwesomeIcon icon={faTrash} />
                               </button>
-                              <button className="icon-wrapper icon-history mr-2">
+                              <button className="icon-wrapper icon-history mr-2"  onClick={() => toggleForm('history', persona)}>
                                 <FontAwesomeIcon icon={faHistory} />
                               </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
+              </div>
               </>
             )}
           </div>

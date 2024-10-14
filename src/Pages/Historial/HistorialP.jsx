@@ -7,7 +7,7 @@ import { faFilePdf, faFileExcel } from '@fortawesome/free-solid-svg-icons';
 import { toast, Toaster } from 'react-hot-toast';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { format, parseISO, addDays } from 'date-fns'; // Importa addDays
+import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import '../../componentes/Table.css';
 import Sidebar from '../../componentes/Sidebar';
@@ -20,10 +20,8 @@ registerLocale('es', es);
 
 const HistorialP = () => {
   const [isSidebarVisible, setSidebarVisible] = useState(true);
-
   const today = new Date();
   const [rangoFechas, setRangoFechas] = useState([today, today]);
-
   const [historialP, setHistorialP] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -43,7 +41,15 @@ const HistorialP = () => {
       if (response.error) {
         throw new Error(response.error.message || 'Error al obtener el historial');
       }
-      setHistorialP(response.data);
+      
+      // Ordenar historialP por fecha y hora
+      const sortedData = response.data.sort((a, b) => {
+        const fechaA = new Date(a.fecha + 'T' + a.hora);
+        const fechaB = new Date(b.fecha + 'T' + b.hora);
+        return fechaA - fechaB; // Orden ascendente
+      });
+
+      setHistorialP(sortedData);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -70,6 +76,7 @@ const HistorialP = () => {
           infoFiltered: '(filtrado de _MAX_ registros en total)', 
           search: 'Buscar:',
         },
+        order: [[4, 'desc'], [5, 'desc']], // Ordena por fecha (columna 4) y hora (columna 5) en orden descendente
       });
     }
   }, [historialP]);
@@ -103,12 +110,11 @@ const HistorialP = () => {
         <Navbar toggleSidebar={toggleSidebar} />
         <div id="content">
           <div className="card shadow mb-4">
-          <center>
-                                <div className="card-header ">
-                                 <h3>Historial Personas</h3>
-                                </div>
-                              
-                            </center>
+            <center>
+              <div className="card-header ">
+                <h3>Historial Personas</h3>
+              </div>
+            </center>
             <div className="py-3 d-flex justify-content-between align-items-center">
               <h6 className="m-0 font-weight-bold text-primary">Seleccionar Rango de Fechas</h6>
               <div className="dropdown">
@@ -116,7 +122,6 @@ const HistorialP = () => {
                   <Dropdown.Toggle variant="primary" id="dropdown-basic">
                     Exportar
                   </Dropdown.Toggle>
-
                   <Dropdown.Menu>
                     <Dropdown.Item
                       as="a"
@@ -151,7 +156,6 @@ const HistorialP = () => {
                   isClearable={true}
                   showPopperArrow={true}
                 />
-
                 <button className="btn btn-primary ml-3" onClick={enviarFechas}>
                   Mostrar registros
                 </button>
@@ -175,21 +179,19 @@ const HistorialP = () => {
                   <tbody>
                     {historialP.map((item, index) => (
                       <tr key={index}>
-                        <td>{item.persona.nombre}</td>
+                        <td>{item.persona?.nombre || item.nombre}</td>
                         <td>
-                          {item.persona.fotoP !== 'Sin foto' ? (
-                            <img
-                              src={item.persona.fotoP}
-                              alt="Foto de la persona"
-                              style={{ width: '60px', height: '60px', objectFit: 'cover' }}
-                            />
+                          {item.persona?.fotoP ? (
+                            <img src={item.persona.fotoP} alt="Foto Persona" style={{ width: '60px', height: '60px', objectFit: 'cover' }} />
                           ) : (
-                            'Sin foto'
+                            'Invitado'
                           )}
                         </td>
-                        <td>{item.estado === 'E' ? 'Entró' : 'Salió'}</td>
-                        <td>{item.usuario.nombre}</td>
-                        <td>{format(parseISO(item.fecha), 'dd/MM/yyyy')}</td>
+                        <td>
+                          {item.estado === 'E' ? 'Entrando' : item.estado === 'S' ? 'Saliendo' : 'Desconocido'}
+                        </td>
+                        <td>{item.usuario?.nombre}</td>
+                        <td>{format(new Date(new Date(item.fecha).toUTCString().slice(0, -3)), 'dd/MM/yyyy')}</td>
                         <td>{item.hora}</td>
                       </tr>
                     ))}

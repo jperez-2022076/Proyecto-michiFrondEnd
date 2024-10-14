@@ -84,8 +84,9 @@ const Sidebar = ({ isSidebarVisible }) => {
               </button>
             </li>
           </>
-        ) : null}
-          {/* Nav Item - Historial de Vehiculos */}
+        ) :
+        <>
+         {/* Nav Item - Historial de Vehiculos */}
             {/* Nav Item - Historial de Vehiculos */}
             <li className="nav-item">
               <button className="nav-link" onClick={() => navigate('/Guardian')}>
@@ -99,7 +100,10 @@ const Sidebar = ({ isSidebarVisible }) => {
                 <span> Buscar por nombre</span>
               </button>
             </li>
-
+</>
+        
+        }
+         
         {/* Este div vacío se expande y empuja el botón de cerrar sesión hacia abajo */}
         <div className="flex-grow-1"></div>
 

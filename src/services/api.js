@@ -144,6 +144,7 @@ export const buscarPersonaId = async(id) =>{
 
 
 
+
 export const listarVehiculo = async() =>{
   try {
     return await apiClient.get('https://proyecto-michi.vercel.app/vehiculo/lista')
@@ -223,6 +224,19 @@ export const listarHistorialP = async(fechas) => {
   }  
 }
 
+export const listarHistorialPersona = async(personaId) => {
+  try {
+    const resultado = await apiClient.get(`https://proyecto-michi.vercel.app/historialP/buscarP/${personaId}`)
+    console.log(resultado)
+    return resultado
+  } catch (err) {
+    return{
+      error: true,
+      err,
+    }
+  }  
+}
+
 export const agregarHistorialP = async(data)=>{
   try {
     return await apiClient.post(`https://proyecto-michi.vercel.app/historialP/agregar`, data)
@@ -247,6 +261,18 @@ export const listaHistorialPV = async(fechas)=>{
     
   }
 }
+export const listaHistorialVehiculo= async(vehiculo)=>{
+  try {
+    return await apiClient.get(`https://proyecto-michi.vercel.app/historialPV/buscarV/${vehiculo}`)
+  } catch (err) {
+    return {
+      error: true,
+      err,
+    }
+    
+  }
+}
+
 
 export const agregarHistorialPV = async(data)=>{
   try {

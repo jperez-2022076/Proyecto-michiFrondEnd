@@ -35,13 +35,21 @@ const HistorialPV = () => {
   const fetchHistorialPV = async (fechas) => {
     setLoading(true);
     setError(null);
-
+  
     try {
       const response = await listaHistorialPV(fechas);
       if (response.error) {
         throw new Error(response.error.message || 'Error al obtener el historial');
       }
-      setHistorialPV(response.data);
+  
+      // Ordenar historialPV por fecha y hora
+      const sortedData = response.data.sort((a, b) => {
+        const fechaA = new Date(a.fecha + 'T' + a.hora);
+        const fechaB = new Date(b.fecha + 'T' + b.hora);
+        return fechaA - fechaB; // Orden ascendente
+      });
+  
+      setHistorialPV(sortedData);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -67,6 +75,7 @@ const HistorialPV = () => {
           infoFiltered: '(filtrado de _MAX_ registros en total)',
           search: 'Buscar:',
         },
+        order: [[6, 'desc'], [7, 'desc']], // Ordena por fecha (columna 6) y hora (columna 7) en orden descendente
       });
     }
   }, [historialPV]);
@@ -191,7 +200,8 @@ const HistorialPV = () => {
                           {item.estado === 'E' ? 'Entrando' : item.estado === 'S' ? 'Saliendo' : 'Desconocido'}
                         </td>
                         <td>{item.usuario?.nombre}</td>
-                        <td>{format(parseISO(item.fecha), 'dd/MM/yyyy')}</td>
+                        <td>{format(new Date(new Date(item.fecha).toUTCString().slice(0, -3)), 'dd/MM/yyyy')}</td>
+
                         <td>{item.hora}</td>
                       </tr>
                     ))}

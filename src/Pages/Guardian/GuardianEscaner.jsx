@@ -21,10 +21,10 @@ const GuardianEscaner = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [showGuestForm, setShowGuestForm] = useState(false); // Para controlar la visibilidad del formulario de invitado
   const [guestData, setGuestData] = useState({ nombre: '', dpi: '', placa: '' }); // Datos del invitado
-
+  const [isGuestDataRetrieved, setIsGuestDataRetrieved] = useState(false); 
   const { data: persona, loading: loadingPersona, error: errorPersona, isSuccess: isPersonSuccess } = useBuscarPersonaId(scannedId);
   const { data: vehiculo, loading: loadingVehiculo, error: errorVehiculo } = useBuscarVehiculoId(scannedVehiculoId);
-  
+  const [scanMessage, setScanMessage] = useState('Escanea una persona...'); 
   const { addHistorial, isLoading: isSavingHistorial } = useAgregarHistorialP();
   const { addHistorialPV, isLoading: isSavingHistorialPV } = useAgregarHistorialPV(); // Hook para historial PV
 
@@ -40,7 +40,6 @@ const GuardianEscaner = () => {
     const newTimeoutId = setTimeout(() => {
       const id = isMobile ? data.split('').reverse().join('') : data;
   
-      // Cambiar la condición para usar startsWith
       if (id.startsWith('Invitado')) {
         setScannedId(id);
         
@@ -48,19 +47,23 @@ const GuardianEscaner = () => {
         const storedGuestData = JSON.parse(localStorage.getItem(id));
         if (storedGuestData) {
           setGuestData(storedGuestData);
-          localStorage.removeItem(id);
+          setIsGuestDataRetrieved(true)
         } else {
           setGuestData({ nombre: '', dpi: '', placa: '' }); // Reiniciar los datos si no existen
+          setIsGuestDataRetrieved(false)
         }
         
         setShowGuestForm(true); // Mostrar el formulario para invitados
         setShowButtons(false);
         e.target.value = '';
         setInputValue('');
-      } else if (!isPersonFound) {
-        setScannedId(id);
       } else {
-        setScannedVehiculoId(id);
+        // Solo buscar personas si no es un invitado
+        if (!isPersonFound) {
+          setScannedId(id);
+        } else {
+          setScannedVehiculoId(id);
+        }
       }
   
       setShowButtons(true);
@@ -73,10 +76,14 @@ const GuardianEscaner = () => {
   
   const handleSaveHistorial = async () => {
     const usuarioId = localStorage.getItem('id');
-    const fechaActual = moment().toISOString();
-    const horaActual = moment().format('HH:mm:ss');
-    
+    const fechaActual = moment().format('YYYY-MM-DD');  // Usar la fecha local sin zona horaria
+    const horaActual = moment().format('HH:mm:ss');  // Hora del dispositivo
+  
     if (showGuestForm) {
+      if (!guestData.nombre || !guestData.dpi || !guestData.placa) {
+        toast.error('Por favor, completa todos los campos del invitado.');
+        return; // Detener ejecución si los campos no están llenos
+    }
       // Guardar la información del invitado
       const dataHistorialPV = {
         nombre: guestData.nombre,
@@ -93,13 +100,15 @@ const GuardianEscaner = () => {
       const response = await addHistorialPV(dataHistorialPV);
   
       if (!response.error) {
+        if(isGuestDataRetrieved){
+          localStorage.removeItem(scannedId);
+        }
         toast.success('Historial de invitado agregado exitosamente.');
         handleReset(); // Reiniciar el formulario después de agregar
       } else {
         toast.error('Error al guardar el historial de invitado.');
       }
     } else if (isPersonFound && persona) {
-      // Si se encontró una persona y no se escaneó un vehículo, guardar en historialP
       if (!scannedVehiculoId) {
         const dataHistorialP = {
           persona: persona._id,
@@ -118,7 +127,6 @@ const GuardianEscaner = () => {
         }
       }
   
-      // Si se escaneó un vehículo, guardar solo en historialPV
       if (scannedVehiculoId) {
         const dataHistorialPV = {
           persona: persona._id,
@@ -132,15 +140,16 @@ const GuardianEscaner = () => {
   
         if (!vehicleResponse.error) {
           toast.success('Historial de vehículo agregado exitosamente.');
-          handleReset(); // Reiniciar el formulario después de agregar
+          handleReset();
         } else {
           toast.error('Error al guardar el historial de vehículo.');
         }
       }
     } else {
-      toast.error('No se ha encontrado una persona.');
+      toast.error('No se ha encontrado una persona.');  // Este mensaje solo aparecerá si realmente no hay una persona.
     }
   };
+  
 
   const handleCancel = () => {
     handleReset(); // Resetea el estado al cancelar
@@ -156,6 +165,7 @@ const GuardianEscaner = () => {
     setGuestData({ nombre: '', dpi: '', placa: '' }); // Resetear datos del invitado
     hiddenInputRef.current.value = '';
     hiddenInputRef.current.focus();
+    setScanMessage('Escanea una persona...'); 
   };
 
   const handleGuestInputChange = (e) => {
@@ -167,8 +177,15 @@ const GuardianEscaner = () => {
     if (isPersonSuccess) {
       setIsPersonFound(true);
       setShowGuestForm(false); // Ocultar formulario si se encuentra a la persona
+      setScanMessage('Escanea un vehículo...'); // Cambiar mensaje al encontrar persona
     }
   }, [isPersonSuccess, persona]);
+
+  useEffect(() => {
+    if (scannedVehiculoId) {
+      setScanMessage('Escanea un vehículo...'); // Cambiar mensaje al escanear vehículo
+    }
+  }, [scannedVehiculoId]);
 
   useEffect(() => {
     hiddenInputRef.current.focus();
@@ -192,13 +209,11 @@ const GuardianEscaner = () => {
       document.removeEventListener('touchstart', handleTouchStart);
     };
   }, []);
-
   useEffect(() => {
-    if (errorPersona) {
+    if (errorPersona && !scannedId.startsWith('Invitado')) {
       toast.error('Error al buscar persona.');
     }
   }, [errorPersona]);
-
   useEffect(() => {
     if (errorVehiculo) {
       toast.error('Error al buscar vehículo.');
@@ -220,10 +235,8 @@ const GuardianEscaner = () => {
             onChange={handleHiddenInputChange}
             autoFocus
           />
-          <h3>Escanea un código...</h3>
+                    <h4>{scanMessage}</h4> 
 
-          {loadingPersona && <p>Cargando información de la persona...</p>}
-          
           {showGuestForm && (
             <div className="card mt-5" style={{ width: '98%' }}>
               <div className="card-body">
@@ -237,6 +250,8 @@ const GuardianEscaner = () => {
                     name="nombre"
                     value={guestData.nombre}
                     onChange={handleGuestInputChange}
+                    maxLength={150}
+                    
                     required
                   />
                 </div>
@@ -249,6 +264,8 @@ const GuardianEscaner = () => {
                     name="dpi"
                     value={guestData.dpi}
                     onChange={handleGuestInputChange}
+                    maxLength={13}
+                    inputMode="numeric" // Para mostrar el teclado numérico en móviles
                     required
                   />
                 </div>
@@ -261,6 +278,7 @@ const GuardianEscaner = () => {
                     name="placa"
                     value={guestData.placa}
                     onChange={handleGuestInputChange}
+                    maxLength={100}
                     required
                   />
                 </div>
