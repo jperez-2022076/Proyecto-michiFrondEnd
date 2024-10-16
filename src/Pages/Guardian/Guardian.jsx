@@ -128,7 +128,7 @@ const Guardian = () => {
       toast.error('Debes seleccionar al menos una persona y un vehículo antes de guardar.');
     }
   };
-
+console.log(addedCards)
   return (
     <div id="wrapper" className={isSidebarVisible ?   'toggled': ''}>
       <Toaster />
@@ -164,7 +164,9 @@ const Guardian = () => {
                           <h5 className="card-title">{card.nombre || card.placa}</h5>
                           <img
                             className='imagen'
-                            src={"https://res.cloudinary.com/dmyubpur2/image/upload/"+card.fotoP || "https://res.cloudinary.com/dmyubpur2/image/upload/"+card.fotoV}
+                            src={card.fotoP 
+                              ? "https://res.cloudinary.com/dmyubpur2/image/upload/" + card.fotoP 
+                              : "https://res.cloudinary.com/dmyubpur2/image/upload/" + card.fotoV}
                             alt={`Sin foto`}
                             style={{ width: '90px', height: '90px', objectFit: 'cover' }}
                           />

@@ -29,7 +29,7 @@ const Sidebar = ({ isSidebarVisible }) => {
         
         {/* Sidebar - Brand */}
         <br />
-        <div className="sidebar-brand d-flex align-items-center justify-content-center" onClick={() => navigate('/')}>
+        <div className="sidebar-brand d-flex align-items-center justify-content-center" >
           <img src={logo} alt="Toggle Sidebar" width="150" height="80" />
           <div className="sidebar-brand-text mx-3">OINSA</div>
         </div>
