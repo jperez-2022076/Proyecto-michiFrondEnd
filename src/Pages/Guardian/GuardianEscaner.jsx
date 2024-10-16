@@ -212,11 +212,15 @@ const GuardianEscaner = () => {
   useEffect(() => {
     if (errorPersona && !scannedId.startsWith('Invitado')) {
       toast.error('Error al buscar persona.');
+      setScannedId(null);
+      setScannedVehiculoId(null);
     }
   }, [errorPersona]);
   useEffect(() => {
     if (errorVehiculo) {
       toast.error('Error al buscar vehículo.');
+      setScannedId(null);
+      setScannedVehiculoId(null);
     }
   }, [errorVehiculo]);
 
