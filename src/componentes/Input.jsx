@@ -10,7 +10,7 @@ const Input = ({ type, id, placeholder, value, onChange }) => {
     <div className="form-group">
       <div className="input-group">
         <input
-          type={showPassword ? 'text' : type}
+          type={showPassword ? 'text' : type} 
           className="form-control form-control-users"
           id={id}
           placeholder={placeholder}
@@ -19,8 +19,9 @@ const Input = ({ type, id, placeholder, value, onChange }) => {
         />
         {type === 'password' && (
           <span
-            className="input-icon "
-            onClick={() => setShowPassword(!showPassword)}
+            className="input-icon"
+            onClick={() => setShowPassword(!showPassword)}  
+            style={{ cursor: 'pointer' }}
           >
             <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
           </span>

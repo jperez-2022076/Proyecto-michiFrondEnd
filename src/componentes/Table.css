@@ -66,6 +66,10 @@
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+.custom-datepicker {
+  width: 225px !important /* Cambia '300px' al tamaño deseado */
+}
+
 
 
 /* Estilo general del DatePicker */

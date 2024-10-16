@@ -41,35 +41,61 @@ const AgregarPersona = ({ onCancel, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validar el número de teléfono
+    const telefonoPattern = /^\+502 \d{4}-\d{4}$/;
+    if (!telefonoPattern.test(userData.telefono)) {
+        toast.error("Por favor, ingrese un número de teléfono válido en el formato +502 1234-5678.");
+        return;
+    }
+
+    // Validar que el DPI solo contenga números y tenga entre 12 y 13 dígitos
+    const dpiPattern = /^\d{12,13}$/;
+    if (!dpiPattern.test(userData.DPI)) {
+        toast.error("El DPI debe contener solo números y tener entre 12 y 13 dígitos.");
+        return;
+    }
+
     setLoading(true);
 
     try {
-      // Subir la imagen a Cloudinary
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', 'unsigned_preset'); // Cambiado a tu upload preset
+        let imageUrl = '';
 
-      const response = await axios.post(
-        'https://api.cloudinary.com/v1_1/dmyubpur2/image/upload',
-        formData
-      );
+        // Subir la imagen a Cloudinary si se selecciona una
+        if (file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', 'unsigned_preset'); // Preset de Cloudinary
 
-      const imageUrl = response.data.secure_url; // URL de la imagen subida
+            const response = await axios.post(
+                'https://api.cloudinary.com/v1_1/dmyubpur2/image/upload',
+                formData
+            );
 
-      // Guardar la URL de la imagen en los datos del usuario
-      const updatedUserData = { ...userData, fotoP: imageUrl };
+            imageUrl = response.data.secure_url; // URL de la imagen subida
 
-      // Llamada al servicio que guarda los datos del usuario y la URL de la imagen en la base de datos
-      await agregarPersona(updatedUserData, onSuccess);
+            // Extraer solo el public_id si es necesario
+            const imageParts = imageUrl.split('/');
+            const imagePublicId = `${imageParts[imageParts.length - 2]}/${imageParts[imageParts.length - 1]}`;
 
-      setLoading(false);
-      onCancel(); // Cerrar el formulario después de guardar
+            imageUrl = imagePublicId; // Guardar solo el public_id en vez de la URL completa
+        }
+
+        // Guardar la URL de la imagen en los datos del usuario
+        const updatedUserData = { ...userData, fotoP: imageUrl || 'Sin foto' };
+
+        // Llamar al servicio que guarda los datos del usuario
+        await agregarPersona(updatedUserData, onSuccess);
+
+        setLoading(false);
+        onCancel(); // Cerrar el formulario después de guardar
     } catch (error) {
-      console.error('Error al subir la imagen:', error);
-      toast.error('Error al subir la imagen. Por favor, inténtalo de nuevo.'); // Mensaje de error
-      setLoading(false);
+        console.error('Error al subir la imagen:', error);
+        toast.error('Error al subir la imagen. Por favor, inténtalo de nuevo.');
+        setLoading(false);
     }
-  };
+};
+
 
   return (
     <form onSubmit={handleSubmit}>
@@ -90,7 +116,7 @@ const AgregarPersona = ({ onCancel, onSuccess }) => {
         </div>
         <div className="form-group col-md-6">
           <label htmlFor="telefono">Teléfono</label>
-          <InputMask mask="+502 9999-9999" className="form-control" id="telefono" name="telefono" value={userData.telefono} onChange={handleChange} required />
+          <InputMask mask="+502 9999-9999" className="form-control" id="telefono" name="telefono"   inputMode="numeric" value={userData.telefono} onChange={handleChange} required />
         </div>
       </div>
       <div className="form-row">
@@ -104,11 +130,14 @@ const AgregarPersona = ({ onCancel, onSuccess }) => {
             value={userData.DPI}
             onChange={handleChange}
             required
+              inputMode="numeric"
+              maxLength={13}
+           
           />
         </div>
         <div className="form-group col-md-6">
           <label htmlFor="fotoP">Foto</label>
-          <input type="file" className="form-control" onChange={handleFileChange} required />
+          <input type="file" className="form-control" onChange={handleFileChange}  />
         </div>
       </div>
       <button type="submit" className="btn btn-primary" disabled={loading}>
@@ -144,30 +173,51 @@ const ActualizarPersona = ({ user, onUpdate, onCancel }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validar el número de teléfono
+    const telefonoPattern = /^\+502 \d{4}-\d{4}$/;
+    if (!telefonoPattern.test(userData.telefono)) {
+        toast.error("Por favor, ingrese un número de teléfono válido en el formato +502 1234-5678.");
+        return;
+    }
+
+    // Validar que el DPI solo contenga números y tenga entre 12 y 13 dígitos
+    const dpiPattern = /^\d{12,13}$/;
+    if (!dpiPattern.test(userData.DPI)) {
+        toast.error("El DPI debe contener solo números y tener entre 12 y 13 dígitos.");
+        return;
+    }
+
     try {
-      let updatedUserData = { ...userData };
+        let updatedUserData = { ...userData };
 
-      // Si hay una nueva foto, súbela a Cloudinary
-      if (file) {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', 'unsigned_preset'); // Cambia esto a tu upload preset
+        // Si hay una nueva foto, subirla a Cloudinary
+        if (file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', 'unsigned_preset'); // Cambia esto a tu preset de Cloudinary
 
-        const response = await axios.post(
-          'https://api.cloudinary.com/v1_1/dmyubpur2/image/upload',
-          formData
-        );
-        const imageUrl = response.data.secure_url;
-        updatedUserData = { ...userData, fotoP: imageUrl };
-      }
+            const response = await axios.post(
+                'https://api.cloudinary.com/v1_1/dmyubpur2/image/upload',
+                formData
+            );
 
-      // Llamada para actualizar la persona
-      await actualizarPersona(user._id, updatedUserData, onUpdate);
+            // Obtener el public_id en lugar de la URL completa
+            const imageId = response.data.public_id;
+
+            // Actualizar solo el public_id de la nueva foto en los datos del usuario
+            updatedUserData = { ...updatedUserData, fotoP: imageId };
+        }
+
+        // Llamar al servicio que actualiza la persona
+        await actualizarPersona(user._id, updatedUserData, onUpdate);
 
     } catch (error) {
-      console.error('Error al actualizar la persona:', error);
+        console.error('Error al actualizar la persona:', error);
+        toast.error('Error al actualizar la persona. Por favor, inténtalo de nuevo.');
     }
-  };
+  }
+
 
   return (
     <form onSubmit={handleSubmit}>
@@ -195,6 +245,7 @@ const ActualizarPersona = ({ user, onUpdate, onCancel }) => {
             value={userData.telefono}
             onChange={handleChange}
             required
+              inputMode="numeric"
           />
         </div>
       </div>
@@ -208,7 +259,9 @@ const ActualizarPersona = ({ user, onUpdate, onCancel }) => {
             name="DPI"
             value={userData.DPI}
             onChange={handleChange}
+        maxLength={13}
             required
+              inputMode="numeric"
           />
         </div>
         <div className="form-group col-md-6">
@@ -276,14 +329,16 @@ const EliminarPersona = ({ user, onDelete, onCancel }) => {
             id="DPI"
             name="DPI"
             value={user.DPI}
-
+            minLength={12}
+            maxLength={13}
             required
             disabled
+              inputMode="numeric"
           />
         </div>
         <div className="form-group col-md-6">
 
-          <img src={user.fotoP} alt="Foto de la persona" style={{ width: '100px', height: '100px' }} />
+          <img src={"https://res.cloudinary.com/dmyubpur2/image/upload/"+user.fotoP} alt="Foto de la persona" style={{ width: '100px', height: '100px' }} />
         </div>
       </div>
       <button type="button" className="btn btn-danger" onClick={handleDelete} disabled={loading}>
@@ -374,7 +429,7 @@ const HistorialPersona = ({ personaId, onCancel }) => {
                     <td>{item.persona?.nombre || item.nombre}</td>
                     <td>
                       {item.persona?.fotoP ? (
-                        <img src={item.persona.fotoP} alt="Foto Persona" style={{ width: '60px', height: '60px', objectFit: 'cover' }} />
+                        <img src={"https://res.cloudinary.com/dmyubpur2/image/upload/"+item.persona.fotoP} alt="Foto Persona" style={{ width: '60px', height: '60px', objectFit: 'cover' }} />
                       ) : (
                         'Invitado'
                       )}
@@ -435,6 +490,8 @@ const Personas = () => {
           info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
           infoFiltered: '(filtrado de _MAX_ registros en total)',
           search: 'Buscar:',
+          infoEmpty: 'Mostrando 0 a 0 de 0 registros',
+          zeroRecords: 'No se encontraron registros que coincidan',
         },
       });
     }
@@ -468,89 +525,97 @@ const Personas = () => {
               </div>
             ) : (
               <>
-              <center>
-              <div className="card-header ">
-                <h3>Personas</h3>
-              </div>
+                <center>
+                  <div className="card-header ">
+                    <h3>Personas</h3>
+                  </div>
 
-            </center>
-            <div className=" py-3 d-flex justify-content-between align-items-center">
-              <button className="btn btn-primary" onClick={() => toggleForm('add')}>
-                Agregar
-              </button>
-              <div className="dropdown">
-                <Dropdown>
-                  <Dropdown.Toggle variant="primary" id="dropdown-basic">
-                    Exportar
-                  </Dropdown.Toggle>
+                </center>
+                <div className=" py-3 d-flex justify-content-between align-items-center">
+                  <button className="btn btn-primary" onClick={() => toggleForm('add')}>
+                    Agregar
+                  </button>
+                  <div className="dropdown">
+                    <Dropdown>
+                      <Dropdown.Toggle variant="primary" id="dropdown-basic">
+                        Exportar
+                      </Dropdown.Toggle>
 
-                  <Dropdown.Menu>
-                    <Dropdown.Item
-                      as="a"
-                      href="https://proyecto-michi.vercel.app/persona/exportar/pdf"
-                      download // Esto indica que es un archivo para descargar
-                    >
-                      <FontAwesomeIcon icon={faFilePdf} className="mr-2" /> Exportar a PDF
-                    </Dropdown.Item>
-                    <Dropdown.Item
-                      as="a"
-                      href="https://proyecto-michi.vercel.app/persona/exportar/excel"
-                      download // Esto indica que es un archivo para descargar
-                    >
-                      <FontAwesomeIcon icon={faFileExcel} className="mr-2" /> Exportar a Excel
-                    </Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown>
-              </div>
-            </div>
-              <div className="card-body">
-                <div className="table-responsive">
-                  <table className="table table-bordered" ref={dataTableRef} width="100%" cellSpacing="0">
+                      <Dropdown.Menu>
+                        <Dropdown.Item
+                          as="a"
+                          href="https://proyecto-michi.vercel.app/persona/exportar/pdf"
+                          download // Esto indica que es un archivo para descargar
+                        >
+                          <FontAwesomeIcon icon={faFilePdf} className="mr-2" /> Exportar a PDF
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                          as="a"
+                          href="https://proyecto-michi.vercel.app/persona/exportar/excel"
+                          download // Esto indica que es un archivo para descargar
+                        >
+                          <FontAwesomeIcon icon={faFileExcel} className="mr-2" /> Exportar a Excel
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </div>
+                </div>
+                <div className="card-body">
+                  <div className="table-responsive">
+                    <table className="table table-bordered" ref={dataTableRef} width="100%" cellSpacing="0">
                     <thead>
                       <tr>
                         <th>Nombre</th>
                         <th>Teléfono</th>
                         <th>DPI</th>
                         <th>Foto</th>
-                        <th>Estado</th>
                         <th>Opciones</th>
                       </tr>
                     </thead>
                     <tbody>
                       {personas.map((persona, index) => (
                         <tr key={index}>
-                         <td>{persona.nombre}</td>
-                            <td>{persona.telefono}</td>
-                            <td>{persona.DPI}</td>
-                            <td>
-                              {persona.fotoP !== 'Sin foto' ? (
-                                <img
-                                  src={persona.fotoP}
-                                  alt="Foto de la persona"
-                                  style={{ width: '50px', height: '50px', objectFit: 'cover' }}
-                                />
-                              ) : (
-                                'Sin foto'
-                              )}
-                            </td>
-                            <td>{persona.estado ? 'Activo' : 'Inactivo'}</td>
+                          <td>{persona.nombre}</td>
+                          <td>{persona.telefono}</td>
+                          <td>{persona.DPI}</td>
                           <td>
-                          <button className="icon-wrapper icon-edit mr-2" onClick={() => toggleForm('edit', persona)}>
-                                <FontAwesomeIcon icon={faEdit} />
-                              </button>
-                              <button className="icon-wrapper icon-delete mr-2" onClick={() => toggleForm('delete', persona)}>
-                                <FontAwesomeIcon icon={faTrash} />
-                              </button>
-                              <button className="icon-wrapper icon-history mr-2"  onClick={() => toggleForm('history', persona)}>
-                                <FontAwesomeIcon icon={faHistory} />
-                              </button>
+                            {persona.fotoP !== 'Sin foto' ? (
+                              <img
+                                src={"https://res.cloudinary.com/dmyubpur2/image/upload/"+persona.fotoP}
+                                alt="Foto de la persona"
+                                style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                              />
+                            ) : (
+                              'Sin foto'
+                            )}
                           </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                            <td>
+                              <div className="dropdown">
+                                <Dropdown>
+                                  <Dropdown.Toggle variant="primary" id="dropdown-basic">
+                                    Opciones
+                                  </Dropdown.Toggle>
+
+                                  <Dropdown.Menu>
+                                    <Dropdown.Item onClick={() => toggleForm('edit', persona)}>
+                                      <FontAwesomeIcon icon={faEdit} className="mr-2" /> Editar
+                                    </Dropdown.Item>
+                                    <Dropdown.Item onClick={() => toggleForm('delete', persona)}>
+                                      <FontAwesomeIcon icon={faTrash} className="mr-2" /> Eliminar
+                                    </Dropdown.Item>
+                                    <Dropdown.Item onClick={() => toggleForm('history', persona)}>
+                                      <FontAwesomeIcon icon={faHistory} className="mr-2" /> Historial
+                                    </Dropdown.Item>
+                                  </Dropdown.Menu>
+                                </Dropdown>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              </div>
               </>
             )}
           </div>

@@ -164,7 +164,7 @@ const Guardian = () => {
                           <h5 className="card-title">{card.nombre || card.placa}</h5>
                           <img
                             className='imagen'
-                            src={card.fotoP || card.fotoV}
+                            src={"https://res.cloudinary.com/dmyubpur2/image/upload/"+card.fotoP || "https://res.cloudinary.com/dmyubpur2/image/upload/"+card.fotoV}
                             alt={`Sin foto`}
                             style={{ width: '90px', height: '90px', objectFit: 'cover' }}
                           />
@@ -187,7 +187,7 @@ const Guardian = () => {
                         <h5 className="card-title me-2">{searchingVehicles ? item.placa : item.nombre}</h5>
                         <img
                           className='imagen'
-                          src={searchingVehicles ? item.fotoV : item.fotoP}
+                          src={searchingVehicles ? "https://res.cloudinary.com/dmyubpur2/image/upload/"+item.fotoV : "https://res.cloudinary.com/dmyubpur2/image/upload/"+item.fotoP}
                           alt={`Sin foto`}
                           style={{ width: '90px', height: '90px', objectFit: 'cover' }}
                         />

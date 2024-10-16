@@ -74,6 +74,8 @@ const HistorialPV = () => {
           info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
           infoFiltered: '(filtrado de _MAX_ registros en total)',
           search: 'Buscar:',
+          infoEmpty: 'Mostrando 0 a 0 de 0 registros',
+          zeroRecords: 'No se encontraron registros que coincidan',
         },
         order: [[6, 'desc'], [7, 'desc']], // Ordena por fecha (columna 6) y hora (columna 7) en orden descendente
       });
@@ -151,7 +153,7 @@ const HistorialPV = () => {
                   selectsRange
                   dateFormat="yyyy-MM-dd"
                   placeholderText="Selecciona el rango de fechas"
-                  className="form-control"
+                  className="form-control custom-datepicker" // Agrega la clase aquí
                   isClearable={true}
                   showPopperArrow={true}
                 />
@@ -168,11 +170,12 @@ const HistorialPV = () => {
                   <thead>
                     <tr>
                       <th>Nombre de persona</th>
+                      <th>DPI</th>
                       <th>Foto de la persona</th>
                       <th>Placa</th>
                       <th>Foto Vehículo</th>
-                      <th>Estado</th>
-                      <th>Usuario</th>
+                      <th>Movimiento</th>
+                      <th>Guardian</th>
                       <th>Fecha</th>
                       <th>Hora</th>
                     </tr>
@@ -181,9 +184,10 @@ const HistorialPV = () => {
                     {historialPV.map((item, index) => (
                       <tr key={index}>
                         <td>{item.persona?.nombre || item.nombre}</td>
+                        <td>{item.persona?.DPI || item.DPI}</td>
                         <td>
                           {item.persona?.fotoP ? (
-                            <img src={item.persona.fotoP} alt="Foto Persona" style={{ width: '60px', height: '60px', objectFit: 'cover' }} />
+                            <img src={"https://res.cloudinary.com/dmyubpur2/image/upload/"+item.persona.fotoP} alt="Foto Persona" style={{ width: '60px', height: '60px', objectFit: 'cover' }} />
                           ) : (
                             'Invitado'
                           )}
@@ -191,7 +195,7 @@ const HistorialPV = () => {
                         <td>{item.vehiculo?.placa || item.placa}</td>
                         <td>
                           {item.vehiculo?.fotoV ? (
-                            <img src={item.vehiculo.fotoV} alt="Foto vehículo" style={{ width: '60px', height: '60px', objectFit: 'cover' }} />
+                            <img src={"https://res.cloudinary.com/dmyubpur2/image/upload/"+item.vehiculo.fotoV} alt="Foto vehículo" style={{ width: '60px', height: '60px', objectFit: 'cover' }} />
                           ) : (
                             'Invitado'
                           )}

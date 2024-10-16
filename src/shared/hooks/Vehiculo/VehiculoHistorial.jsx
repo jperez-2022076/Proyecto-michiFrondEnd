@@ -15,10 +15,10 @@ const useListarHistorialVehiculo = () => {
 
             if (response.error) {
                 setError(response.err);
-                toast.error('Error al listar el historial del vehículo');
+               
             } else {
                 setHistorial(response.data); // Asumiendo que la respuesta tiene una propiedad "data"
-                toast.success('Historial de vehículo obtenido exitosamente');
+            
             }
         } catch (err) {
             setError(err);

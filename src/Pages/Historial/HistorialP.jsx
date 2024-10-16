@@ -75,6 +75,8 @@ const HistorialP = () => {
           info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
           infoFiltered: '(filtrado de _MAX_ registros en total)', 
           search: 'Buscar:',
+          infoEmpty: 'Mostrando 0 a 0 de 0 registros',
+          zeroRecords: 'No se encontraron registros que coincidan',
         },
         order: [[4, 'desc'], [5, 'desc']], // Ordena por fecha (columna 4) y hora (columna 5) en orden descendente
       });
@@ -152,9 +154,10 @@ const HistorialP = () => {
                   selectsRange
                   dateFormat="yyyy-MM-dd"
                   placeholderText="Selecciona el rango de fechas"
-                  className="form-control"
+                  className="form-control custom-datepicker" // Agrega la clase aquí
                   isClearable={true}
                   showPopperArrow={true}
+                 
                 />
                 <button className="btn btn-primary ml-3" onClick={enviarFechas}>
                   Mostrar registros
@@ -169,9 +172,10 @@ const HistorialP = () => {
                   <thead>
                     <tr>
                       <th>Nombre de persona</th>
+                      <th>DPI</th>
                       <th>Foto de la persona</th>
                       <th>Estado</th>
-                      <th>Usuario</th>
+                      <th>Guardian</th>
                       <th>Fecha</th>
                       <th>Hora</th>
                     </tr>
@@ -180,9 +184,10 @@ const HistorialP = () => {
                     {historialP.map((item, index) => (
                       <tr key={index}>
                         <td>{item.persona?.nombre || item.nombre}</td>
+                        <td>{item.persona?.DPI || item.DPI}</td>
                         <td>
                           {item.persona?.fotoP ? (
-                            <img src={item.persona.fotoP} alt="Foto Persona" style={{ width: '60px', height: '60px', objectFit: 'cover' }} />
+                            <img src={"https://res.cloudinary.com/dmyubpur2/image/upload/"+item.persona.fotoP} alt="Foto Persona" style={{ width: '60px', height: '60px', objectFit: 'cover' }} />
                           ) : (
                             'Invitado'
                           )}

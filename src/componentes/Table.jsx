@@ -14,6 +14,9 @@ import { listarUsuarios } from '../services/api';
 import useAgregarUsuario from '../shared/hooks/User';
 import useActualizarUsuario from '../shared/hooks/UsuarioActualiza';
 import useEliminarUsuario from '../shared/hooks/UsuarioEliminar';
+import { Dropdown } from 'react-bootstrap';
+import Input from '../componentes/Input';
+
 
 const AgregarUsuario = ({ onCancel, onSuccess }) => {
   const { agregarUsuario, loading } = useAgregarUsuario();
@@ -28,11 +31,20 @@ const AgregarUsuario = ({ onCancel, onSuccess }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log(name, value);  // Agregar este log
     setUserData((prev) => ({ ...prev, [name]: value }));
   };
-
   const handleSubmit = (e) => {
+  
     e.preventDefault();
+
+   // Validar el número de teléfono
+   const telefonoPattern = /^\+502 \d{4}-\d{4}$/;
+   if (!telefonoPattern.test(userData.telefono)) {
+     toast.error("Por favor, ingrese un número de teléfono válido.");
+     return;
+   }
+
     agregarUsuario(userData, onSuccess);
     onCancel()
 
@@ -45,25 +57,35 @@ const AgregarUsuario = ({ onCancel, onSuccess }) => {
       <div className="form-row">
         <div className="form-group col-md-6">
           <label htmlFor="usuario">Usuario</label>
-          <input type="text" className="form-control" id="usuario" name="usuario" value={userData.usuario} onChange={handleChange} required />
+          <input type="text" className="form-control" id="usuario" name="usuario" value={userData.usuario} onChange={handleChange} maxLength={50} required />
         </div>
         <div className="form-group col-md-6">
           <label htmlFor="nombre">Nombre</label>
-          <input type="text" className="form-control" id="nombre" name="nombre" value={userData.nombre} onChange={handleChange} required />
+          <input type="text" className="form-control" id="nombre" name="nombre" value={userData.nombre} onChange={handleChange} required  maxLength={150}/>
         </div>
       </div>
       <div className="form-row">
         <div className="form-group col-md-6">
           <label htmlFor="telefono">Teléfono</label>
-          <InputMask mask="+502 9999-9999" className="form-control" id="telefono" name="telefono" value={userData.telefono} onChange={handleChange} required />
+          <InputMask mask="+502 9999-9999"  className="form-control" id="telefono" name="telefono" value={userData.telefono} onChange={handleChange} required   inputMode="numeric" />
         </div>
         <div className="form-group col-md-6">
-          <label htmlFor="password">Contraseña</label>
-          <input type="password" className="form-control" id="password" name="password" value={userData.password} onChange={handleChange} required />
-        </div>
+  <label htmlFor="password">Contraseña</label>
+  <Input
+    type="password"
+    className="form-control"
+    id="password"
+    name="password"
+    placeholder="Contraseña"
+    onChange={handleChange}
+    required
+    maxLength={50}
+  />
+</div>
+
       </div>
       <div className="form-group">
-        <label htmlFor="rol">Rol</label>
+        <label htmlFor="rol">Tipo de Usuario</label>
         <select className="form-control" id="rol" name="rol" value={userData.rol} onChange={handleChange}>
           <option value={"GUARDIAN"}>Guardian</option>
           <option value={"ADMIN"} >Administrador</option>
@@ -88,6 +110,14 @@ const ActualizarUsuario = ({ user, onUpdate, onCancel }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+  // Validar el número de teléfono
+  const telefonoPattern = /^\+502 \d{4}-\d{4}$/;
+  if (!telefonoPattern.test(userData.telefono)) {
+    toast.error("Por favor, ingrese un número de teléfono válido.");
+    return;
+  }
+
 
     const updatedUserData = { ...userData };
 
@@ -114,6 +144,7 @@ const ActualizarUsuario = ({ user, onUpdate, onCancel }) => {
             value={userData.usuario}
             onChange={handleChange}
             required
+            maxLength={50}
           />
         </div>
         <div className="form-group col-md-6">
@@ -126,6 +157,7 @@ const ActualizarUsuario = ({ user, onUpdate, onCancel }) => {
             value={userData.nombre}
             onChange={handleChange}
             required
+            maxLength={150}
           />
         </div>
       </div>
@@ -140,6 +172,7 @@ const ActualizarUsuario = ({ user, onUpdate, onCancel }) => {
             value={userData.telefono}
             onChange={handleChange}
             required
+            inputMode="numeric"
           />
         </div>
         <div className="form-group col-md-6">
@@ -151,11 +184,12 @@ const ActualizarUsuario = ({ user, onUpdate, onCancel }) => {
             name="password"
             value={userData.password || ''} // Muestra la contraseña como vacía si es null
             onChange={handleChange}
+            maxLength={50}
           />
         </div>
       </div>
       <div className="form-group">
-        <label htmlFor="rol">Rol</label>
+        <label htmlFor="rol">Tipo de Usuario </label>
         <select
           className="form-control"
           id="rol"
@@ -209,7 +243,7 @@ const EliminarUsuario = ({ user, onDelete, onCancel }) => {
           <InputMask mask="+502 9999-9999" className="form-control" id="telefono" name="telefono" value={user.telefono} disabled />
         </div>
         <div className="form-group col-md-6">
-          <label htmlFor="rol">Rol</label>
+          <label htmlFor="rol">Tipo de Usuario</label>
           <select className="form-control" id="rol" name="rol" value={user.rol} disabled>
             <option>{user.rol}</option>
             {/* Otros roles si necesitas */}
@@ -266,12 +300,14 @@ const Table = () => {
         language: {
           lengthMenu: 'Mostrar <span class="custom-select-container">_MENU_</span> cantidad de registros',
           info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
-          infoFiltered: '(filtrado de _MAX_ registros en total)', 
+          infoFiltered: '(filtrado de _MAX_ registros en total)',
           search: 'Buscar:',
+          infoEmpty: 'Mostrando 0 a 0 de 0 registros',
+          zeroRecords: 'No se encontraron registros que coincidan',
         },
-      
+
       });
-      
+
     }
   }, [usuarios]);
 
@@ -353,8 +389,7 @@ const Table = () => {
                           <th>Usuario</th>
                           <th>Nombre</th>
                           <th>Teléfono</th>
-                          <th>Rol</th>
-                          <th>Estado</th>
+                          <th>Tipo de Usuario</th>
                           <th>Opciones</th>
                         </tr>
                       </thead>
@@ -365,15 +400,24 @@ const Table = () => {
                             <td>{usuario.nombre}</td>
                             <td>{usuario.telefono}</td>
                             <td>{usuario.rol === 'ADMIN' ? 'Administrador' : 'Guardian'}</td>
-                            <td>{usuario.estado ? 'Activo' : 'Inactivo'}</td>
+            
                             <td className="text-center">
-                              <button className="icon-wrapper icon-edit mr-2" onClick={() => toggleForm('edit', usuario)}>
-                                <FontAwesomeIcon icon={faEdit} />
-                              </button>
-                              <button className="icon-wrapper icon-delete mr-2" onClick={() => toggleForm('delete', usuario)}>
-                                <FontAwesomeIcon icon={faTrash} />
-                              </button>
+                              <div className="dropdown">
+                                <Dropdown>
+                                  <Dropdown.Toggle variant="primary" id="dropdown-basic">
+                                    Opciones
+                                  </Dropdown.Toggle>
 
+                                  <Dropdown.Menu>
+                                    <Dropdown.Item onClick={() => toggleForm('edit', usuario)}>
+                                      <FontAwesomeIcon icon={faEdit} className="mr-2" /> Editar
+                                    </Dropdown.Item>
+                                    <Dropdown.Item onClick={() => toggleForm('delete', usuario)}>
+                                      <FontAwesomeIcon icon={faTrash} className="mr-2" /> Eliminar
+                                    </Dropdown.Item>
+                                  </Dropdown.Menu>
+                                </Dropdown>
+                              </div>
                             </td>
                           </tr>
                         ))}

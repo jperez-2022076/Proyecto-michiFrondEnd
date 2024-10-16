@@ -305,7 +305,7 @@ const GuardianEscaner = () => {
                   <div className="text-right">
                     <img
                       className="imagen"
-                      src={persona.fotoP || 'Sin foto'}
+                      src={"https://res.cloudinary.com/dmyubpur2/image/upload/"+persona.fotoP || 'Sin foto'}
                       alt="Persona"
                       style={{ width: '80px', height: '80px', objectFit: 'cover' }}
                     />
@@ -314,7 +314,7 @@ const GuardianEscaner = () => {
                   <div className="mt-3">
                     <img
                       className="image_n"
-                      src={persona.fotoP || 'Sin foto'}
+                      src={"https://res.cloudinary.com/dmyubpur2/image/upload/"+persona.fotoP || 'Sin foto'}
                       alt="Persona"
                       style={{ width: '150px', height: '150px', objectFit: 'cover' }}
                     />
@@ -328,7 +328,7 @@ const GuardianEscaner = () => {
             <div className="card card-persona mt-5">
               <div className="card-body d-flex flex-column align-items-center">
                 <h4 className="card-title">Placa: {vehiculo.placa}</h4>
-                <img className="persona-image" src={vehiculo.fotoV || 'Sin foto'} alt="Vehículo" style={{ width: '200px', height: '250px', objectFit: 'cover' }} />
+                <img className="persona-image" src={"https://res.cloudinary.com/dmyubpur2/image/upload/"+vehiculo.fotoV || 'Sin foto'} alt="Vehículo" style={{ width: '200px', height: '250px', objectFit: 'cover' }} />
               </div>
             </div>
           )}
