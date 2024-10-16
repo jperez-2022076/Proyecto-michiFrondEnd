@@ -174,7 +174,7 @@ const HistorialP = () => {
                       <th>Nombre de persona</th>
                       <th>DPI</th>
                       <th>Foto de la persona</th>
-                      <th>Estado</th>
+                      <th>Movimiento</th>
                       <th>Guardian</th>
                       <th>Fecha</th>
                       <th>Hora</th>
