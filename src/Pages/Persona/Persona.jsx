@@ -567,7 +567,7 @@ const Personas = () => {
                       <tr>
                         <th>Nombre</th>
                         <th>Teléfono</th>
-                        <th>DPI</th>
+                        <th style={{ textAlign: 'left' }}>DPI</th>
                         <th>Foto</th>
                         <th>Opciones</th>
                       </tr>
@@ -577,7 +577,7 @@ const Personas = () => {
                         <tr key={index}>
                           <td>{persona.nombre}</td>
                           <td>{persona.telefono}</td>
-                          <td>{persona.DPI}</td>
+                          <td style={{ textAlign: 'left' }}>{persona.DPI}</td>
                           <td>
                             {persona.fotoP !== 'Sin foto' ? (
                               <img

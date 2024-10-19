@@ -71,16 +71,16 @@ const AgregarUsuario = ({ onCancel, onSuccess }) => {
         </div>
         <div className="form-group col-md-6">
   <label htmlFor="password">Contraseña</label>
-  <Input
-    type="password"
-    className="form-control"
-    id="password"
-    name="password"
-    placeholder="Contraseña"
-    onChange={handleChange}
-    required
-    maxLength={50}
-  />
+  <input
+            type="password"
+            className="form-control"
+            id="password"
+            name="password"
+            value={userData.password } // Muestra la contraseña como vacía si es null
+            onChange={handleChange}
+            maxLength={50}
+            required
+          />
 </div>
 
       </div>
