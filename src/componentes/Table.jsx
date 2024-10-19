@@ -76,7 +76,7 @@ const AgregarUsuario = ({ onCancel, onSuccess }) => {
             className="form-control"
             id="password"
             name="password"
-            value={userData.password } // Muestra la contraseña como vacía si es null
+            value={userData.password }
             onChange={handleChange}
             maxLength={50}
             required
