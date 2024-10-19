@@ -51,6 +51,10 @@ const HistorialPV = () => {
   
       setHistorialPV(sortedData);
     } catch (err) {
+      if ($.fn.dataTable.isDataTable(dataTableRef.current)) {
+        $(dataTableRef.current).DataTable().destroy();
+      }
+      setHistorialPV([]); 
       setError(err.message);
     } finally {
       setLoading(false);
@@ -77,7 +81,7 @@ const HistorialPV = () => {
           infoEmpty: 'Mostrando 0 a 0 de 0 registros',
           zeroRecords: 'No se encontraron registros que coincidan',
         },
-        order: [[6, 'desc'], [7, 'desc']], // Ordena por fecha (columna 6) y hora (columna 7) en orden descendente
+        order: [[7, 'desc'], [8, 'desc']], // Ordena por fecha (columna 6) y hora (columna 7) en orden descendente
       });
     }
   }, [historialPV]);
@@ -86,12 +90,11 @@ const HistorialPV = () => {
     setRangoFechas(dates);
   };
 
+  
   const enviarFechas = () => {
     if (fechaInicio && fechaFinal) {
       const fechaInicioFormateada = format(fechaInicio, 'yyyy-MM-dd');
       const fechaFinalFormateada = format(fechaFinal, 'yyyy-MM-dd');
-      console.log('Fecha de Inicio:', fechaInicioFormateada);
-      console.log('Fecha Final:', fechaFinalFormateada);
 
       if ($.fn.dataTable.isDataTable(dataTableRef.current)) {
         $(dataTableRef.current).DataTable().destroy();
@@ -126,14 +129,14 @@ const HistorialPV = () => {
                   <Dropdown.Menu>
                     <Dropdown.Item
                       as="a"
-                      href={`https://proyecto-michi.vercel.app/historialPV/exportar/pdf/${fechaInicio}/${fechaFinal}`}
+                      href={`https://proyecto-michi.vercel.app/historialPV/exportar/pdf/${format(fechaInicio, 'yyyy-MM-dd')}/${format(fechaFinal, 'yyyy-MM-dd')}`}
                       download
                     >
                       <FontAwesomeIcon icon={faFilePdf} className="mr-2" /> Exportar a PDF
                     </Dropdown.Item>
                     <Dropdown.Item
                       as="a"
-                      href={`https://proyecto-michi.vercel.app/historialPV/exportar/excel/${fechaInicio}/${fechaFinal}`}
+                      href={`https://proyecto-michi.vercel.app/historialPV/exportar/excel/${format(fechaInicio, 'yyyy-MM-dd')}/${format(fechaFinal, 'yyyy-MM-dd')}`}
                       download
                     >
                       <FontAwesomeIcon icon={faFileExcel} className="mr-2" /> Exportar a Excel

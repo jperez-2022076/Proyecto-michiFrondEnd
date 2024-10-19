@@ -177,6 +177,7 @@ const GuardianEscaner = () => {
     if (isPersonSuccess) {
       setIsPersonFound(true);
       setShowGuestForm(false); // Ocultar formulario si se encuentra a la persona
+   
       setScanMessage('Escanea un vehículo...'); // Cambiar mensaje al encontrar persona
     }
   }, [isPersonSuccess, persona]);

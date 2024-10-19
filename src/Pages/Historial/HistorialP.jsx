@@ -14,6 +14,7 @@ import Sidebar from '../../componentes/Sidebar';
 import Navbar from '../../componentes/Navbar';
 import { Dropdown } from 'react-bootstrap';
 import { listarHistorialP } from '../../services/api';
+import { constructFromSymbol } from 'date-fns/constants';
 
 // Registra la localización
 registerLocale('es', es);
@@ -27,6 +28,7 @@ const HistorialP = () => {
   const [error, setError] = useState(null);
   const dataTableRef = useRef(null);
   const [fechaInicio, fechaFinal] = rangoFechas;
+
 
   const toggleSidebar = () => {
     setSidebarVisible(!isSidebarVisible);
@@ -51,6 +53,10 @@ const HistorialP = () => {
 
       setHistorialP(sortedData);
     } catch (err) {
+      if ($.fn.dataTable.isDataTable(dataTableRef.current)) {
+        $(dataTableRef.current).DataTable().destroy();
+      }
+      setHistorialP([]); 
       setError(err.message);
     } finally {
       setLoading(false);
@@ -60,7 +66,6 @@ const HistorialP = () => {
   useEffect(() => {
     const fechaInicioFormateada = format(fechaInicio, 'yyyy-MM-dd');
     const fechaFinalFormateada = format(fechaFinal, 'yyyy-MM-dd');
-
     fetchHistorialP({ fechaInicio: fechaInicioFormateada, fechaFinal: fechaFinalFormateada });
   }, []);
 
@@ -78,7 +83,7 @@ const HistorialP = () => {
           infoEmpty: 'Mostrando 0 a 0 de 0 registros',
           zeroRecords: 'No se encontraron registros que coincidan',
         },
-        order: [[4, 'desc'], [5, 'desc']], // Ordena por fecha (columna 4) y hora (columna 5) en orden descendente
+        order: [[5, 'desc'], [6, 'desc']], // Ordena por fecha (columna 4) y hora (columna 5) en orden descendente
       });
     }
   }, [historialP]);
@@ -91,9 +96,6 @@ const HistorialP = () => {
     if (fechaInicio && fechaFinal) {
       const fechaInicioFormateada = format(fechaInicio, 'yyyy-MM-dd');
       const fechaFinalFormateada = format(fechaFinal, 'yyyy-MM-dd');
-      console.log('Fecha de Inicio:', fechaInicioFormateada);
-      console.log('Fecha Final:', fechaFinalFormateada);
-
       if ($.fn.dataTable.isDataTable(dataTableRef.current)) {
         $(dataTableRef.current).DataTable().destroy();
       }
@@ -127,14 +129,14 @@ const HistorialP = () => {
                   <Dropdown.Menu>
                     <Dropdown.Item
                       as="a"
-                      href={`https://proyecto-michi.vercel.app/historialP/exportar/pdf/${fechaInicio}/${fechaFinal}`}
+                      href={`https://proyecto-michi.vercel.app/historialP/exportar/pdf/${format(fechaInicio, 'yyyy-MM-dd')}/${format(fechaFinal, 'yyyy-MM-dd')}`}
                       download
                     >
                       <FontAwesomeIcon icon={faFilePdf} className="mr-2" /> Exportar a PDF
                     </Dropdown.Item>
                     <Dropdown.Item
                       as="a"
-                      href={`https://proyecto-michi.vercel.app/historialP/exportar/excel/${fechaInicio}/${fechaFinal}`}
+                      href={`https://proyecto-michi.vercel.app/historialP/exportar/excel/${format(fechaInicio, 'yyyy-MM-dd')}/${format(fechaFinal, 'yyyy-MM-dd')}`}
                       download
                     >
                       <FontAwesomeIcon icon={faFileExcel} className="mr-2" /> Exportar a Excel
