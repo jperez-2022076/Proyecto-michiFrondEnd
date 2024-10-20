@@ -583,7 +583,7 @@ const Personas = () => {
                               <img
                                 src={"https://res.cloudinary.com/dmyubpur2/image/upload/"+persona.fotoP}
                                 alt="Foto de la persona"
-                                style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                                style={{ width: '60px', height: '60px', objectFit: 'cover' }}
                               />
                             ) : (
                               'Sin foto'

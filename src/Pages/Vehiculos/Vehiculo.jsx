@@ -716,7 +716,7 @@ const Vehiculos = () => {
                                                                 <img
                                                                     src={"https://res.cloudinary.com/dmyubpur2/image/upload/" + vehiculo.fotoV}
                                                                     alt="Foto del vehiculo"
-                                                                    style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                                                                    style={{ width: '60px', height: '60px', objectFit: 'cover' }}
                                                                 />
                                                             ) : (
                                                                 'Sin foto'
