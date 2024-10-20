@@ -181,29 +181,45 @@ console.log(addedCards)
           </div>
 
           <div className="mt-5 pt-3 container" style={{ width: '100%' }}>
-            <div className="row">
-              {filteredCards.map(item => (
-                <div key={item._id || item.id} className="col mb-2" style={{ cursor: 'pointer' }}>
-                  <div className={`card h-100`}>
-                    <div className="card-body">
-                      <div className="d-flex align-items-center justify-content-between">
-                        <h5 className="card-title me-2">{searchingVehicles ? item.placa : item.nombre}</h5>
-                    
-                        <img
-                          className='imagen'
-                          src={searchingVehicles ? "https://res.cloudinary.com/dmyubpur2/image/upload/"+item.fotoV : "https://res.cloudinary.com/dmyubpur2/image/upload/"+item.fotoP}
-                          alt={`Sin foto`}
-                          style={{ width: '90px', height: '90px', objectFit: 'cover' }}
-                        />
-                      </div>
-                      <h5 className="card-title me-2">{searchingVehicles ?"Código: "+ item.codigo :"DPI: "+ item.DPI}</h5>
-                      <button className="btn btn-success mt-2" onClick={() => handleAddCard(item)}>Agregar</button>
-                    </div>
-                  </div>
-                </div>
-              ))}
+  <div className="row">
+    {filteredCards.map(item => (
+      <div key={item._id || item.id} className="col mb-2" style={{ cursor: 'pointer' }}>
+        <div className="card h-100">
+          <div className="card-body">
+            <div className="d-flex align-items-center">
+              {/* Texto: ocupa el 50% */}
+              <div style={{ width: '50%' }}>
+                <h5 className="card-title me-2">
+                  {searchingVehicles ? item.placa : item.nombre}
+                </h5>
+                <h5 className="card-title me-2">
+                  {searchingVehicles ? "Código: " + item.codigo : "DPI: " + item.DPI}
+                </h5>
+              </div>
+
+              {/* Imagen: ocupa el otro 50% */}
+              <div style={{ width: '50%', textAlign: 'right' }}>
+                <img
+                  className='imagen'
+                  src={
+                    searchingVehicles 
+                    ? "https://res.cloudinary.com/dmyubpur2/image/upload/" + item.fotoV
+                    : "https://res.cloudinary.com/dmyubpur2/image/upload/" + item.fotoP
+                  }
+                  alt={`Sin foto`}
+                  style={{ width: '90px', height: '90px', objectFit: 'cover' }}
+                />
+              </div>
             </div>
+            <button className="btn btn-success mt-2" onClick={() => handleAddCard(item)}>
+              Agregar
+            </button>
           </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
           <br /><br />
           {showButtons && (
             <div className="d-flex mt-3" style={{ position: 'absolute', bottom: '20px', left: '50%', transform: 'translateX(-50%)' }}>
