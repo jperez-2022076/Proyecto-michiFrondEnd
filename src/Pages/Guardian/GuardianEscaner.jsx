@@ -299,35 +299,49 @@ const GuardianEscaner = () => {
             </div>
           )}
 
-          {isPersonFound && persona && (
-            <div className="card mt-5" style={scannedVehiculoId ? { width: '98%', height: '15%' } : { width: '98%', height: 'auto' }}>
-              <div className={scannedVehiculoId ? 'card-body d-flex align-items-center justify-content-between' : 'card-body d-flex flex-column align-items-center'} style={{ height: '100%' }}>
-                <div className={`${scannedVehiculoId ? 'text-left' : 'text-center'}`}>
-                  <h5 className="card-title mb-0">{persona.nombre}</h5>
-                  <h6 className="mt-2">DPI: {persona.DPI}</h6>
-                </div>
-                {scannedVehiculoId ? (
-                  <div className="text-right">
-                    <img
-                      className="imagen"
-                      src={"https://res.cloudinary.com/dmyubpur2/image/upload/"+persona.fotoP || 'Sin foto'}
-                      alt="Persona"
-                      style={{ width: '80px', height: '80px', objectFit: 'cover' }}
-                    />
-                  </div>
-                ) : (
-                  <div className="mt-3">
-                    <img
-                      className="image_n"
-                      src={"https://res.cloudinary.com/dmyubpur2/image/upload/"+persona.fotoP || 'Sin foto'}
-                      alt="Persona"
-                      style={{ width: '150px', height: '150px', objectFit: 'cover' }}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+{isPersonFound && persona && (
+  <div
+    className="card mt-5"
+    style={scannedVehiculoId ? { width: '98%', height: '15%' } : { width: '98%', height: 'auto' }}
+  >
+    <div
+      className={scannedVehiculoId
+        ? 'card-body d-flex align-items-center justify-content-between'
+        : 'card-body d-flex flex-column align-items-center'
+      }
+      style={{ height: '100%' }}
+    >
+      <div
+        className={`${scannedVehiculoId ? 'text-left' : 'text-center'}`}
+        style={scannedVehiculoId ? { width: '50%' } : { width: '100%' }} // Aseguramos que el texto ocupe la mitad del espacio
+      >
+        <h5 className="card-title mb-0">{persona.nombre}</h5>
+        <h6 className="mt-2">DPI: {persona.DPI}</h6>
+      </div>
+      
+      {scannedVehiculoId ? (
+        <div className="text-right" style={{ width: '50%' }}> {/* Aseguramos que la imagen ocupe el otro 50% */}
+          <img
+            className="imagen"
+            src={"https://res.cloudinary.com/dmyubpur2/image/upload/" + persona.fotoP || 'Sin foto'}
+            alt="Persona"
+            style={{ width: '80px', height: '80px', objectFit: 'cover' }}
+          />
+        </div>
+      ) : (
+        <div className="mt-3">
+          <img
+            className="image_n"
+            src={"https://res.cloudinary.com/dmyubpur2/image/upload/" + persona.fotoP || 'Sin foto'}
+            alt="Persona"
+            style={{ width: '150px', height: '150px', objectFit: 'cover' }}
+          />
+        </div>
+      )}
+    </div>
+  </div>
+)}
+
 
           {isPersonFound && scannedVehiculoId && vehiculo && (
             <div className="card card-persona mt-5">
@@ -338,7 +352,7 @@ const GuardianEscaner = () => {
               </div>
             </div>
           )}
-
+  <br />
           {isPersonFound && showButtons && !showGuestForm && (
             <div className="d-flex mt-3" style={{ position: 'absolute', bottom: '20px', left: '50%', transform: 'translateX(-50%)' }}>
               <button className="btn btn-success mr-2" onClick={handleSaveHistorial} disabled={isSavingHistorial || isSavingHistorialPV}>
