@@ -162,6 +162,7 @@ console.log(addedCards)
                       <div className={`card added-card`}>
                         <div className="card-body">
                           <h5 className="card-title">{card.nombre || card.placa}</h5>
+                          <h6 className="card-title">{"DPI: "+card.DPI ||"Código: "+ card.codigo}</h6>
                           <img
                             className='imagen'
                             src={card.fotoP 
@@ -187,6 +188,7 @@ console.log(addedCards)
                     <div className="card-body">
                       <div className="d-flex align-items-center justify-content-between">
                         <h5 className="card-title me-2">{searchingVehicles ? item.placa : item.nombre}</h5>
+                    
                         <img
                           className='imagen'
                           src={searchingVehicles ? "https://res.cloudinary.com/dmyubpur2/image/upload/"+item.fotoV : "https://res.cloudinary.com/dmyubpur2/image/upload/"+item.fotoP}
@@ -194,6 +196,7 @@ console.log(addedCards)
                           style={{ width: '90px', height: '90px', objectFit: 'cover' }}
                         />
                       </div>
+                      <h5 className="card-title me-2">{searchingVehicles ?"Código: "+ item.codigo :"DPI: "+ item.DPI}</h5>
                       <button className="btn btn-success mt-2" onClick={() => handleAddCard(item)}>Agregar</button>
                     </div>
                   </div>

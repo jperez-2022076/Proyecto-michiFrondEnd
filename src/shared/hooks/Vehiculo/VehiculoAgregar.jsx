@@ -13,9 +13,9 @@ const useAgregarVehiculo=()=>{
             const response = await agregarVehiculoRequest(userData)
             if (response.error) {
                 setError(response.err);
-                toast.error('Error al agregar Persona');
+                toast.error('Error al agregar Vehiculo');
               } else {
-                toast.success('Persona agregado exitosamente');
+                toast.success('Vehiculo agregado exitosamente');
                 if (onSuccess) {
                   onSuccess(); // Ejecutar callback de éxito
                 }
@@ -23,7 +23,7 @@ const useAgregarVehiculo=()=>{
         } catch (err) {
             console.log(err)
             setError(err)
-            toast.error('Ocurrio un error inesperado al agregar Persona intenta de nuevo')
+            toast.error('Ocurrio un error inesperado al agregar Vehiculo intenta de nuevo')
         }finally{
             setLoading(false)
         }

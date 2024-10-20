@@ -81,7 +81,7 @@ const HistorialPV = () => {
           infoEmpty: 'Mostrando 0 a 0 de 0 registros',
           zeroRecords: 'No se encontraron registros que coincidan',
         },
-        order: [[7, 'desc'], [8, 'desc']], // Ordena por fecha (columna 6) y hora (columna 7) en orden descendente
+        order: [[8, 'desc'], [9, 'desc']], // Ordena por fecha (columna 6) y hora (columna 7) en orden descendente
       });
     }
   }, [historialPV]);
@@ -176,6 +176,7 @@ const HistorialPV = () => {
                       <th>DPI</th>
                       <th>Foto de la persona</th>
                       <th>Placa</th>
+                      <th>Código</th>
                       <th>Foto Vehículo</th>
                       <th>Movimiento</th>
                       <th>Guardian</th>
@@ -196,6 +197,7 @@ const HistorialPV = () => {
                           )}
                         </td>
                         <td>{item.vehiculo?.placa || item.placa}</td>
+                        <td>{item.vehiculo.codigo ? item.vehiculo.codigo : "Sin código"}</td>
                         <td>
                           {item.vehiculo?.fotoV ? (
                             <img src={"https://res.cloudinary.com/dmyubpur2/image/upload/"+item.vehiculo.fotoV} alt="Foto vehículo" style={{ width: '60px', height: '60px', objectFit: 'cover' }} />

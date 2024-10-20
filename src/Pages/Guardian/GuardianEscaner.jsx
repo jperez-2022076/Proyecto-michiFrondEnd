@@ -333,6 +333,7 @@ const GuardianEscaner = () => {
             <div className="card card-persona mt-5">
               <div className="card-body d-flex flex-column align-items-center">
                 <h4 className="card-title">Placa: {vehiculo.placa}</h4>
+                <h4 className="card-title">Código: {vehiculo.codigo? vehiculo.codigo : "Sin código"}</h4>
                 <img className="persona-image" src={"https://res.cloudinary.com/dmyubpur2/image/upload/"+vehiculo.fotoV || 'Sin foto'} alt="Vehículo" style={{ width: '200px', height: '250px', objectFit: 'cover' }} />
               </div>
             </div>

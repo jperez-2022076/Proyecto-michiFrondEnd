@@ -27,6 +27,7 @@ const AgregarVehiculo = ({ onCancel, onSuccess }) => {
     const { agregarVehiculo } = useAgregarVehiculo();
     const [userData, setUserData] = useState({
         placa: '',
+        codigo: '',
         fotoV: '',
     });
     const [file, setFile] = useState(null);
@@ -44,7 +45,7 @@ const AgregarVehiculo = ({ onCancel, onSuccess }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-    
+
         try {
             // Subir la imagen a Cloudinary si se ha seleccionado una
             let imagePublicId = '';
@@ -52,25 +53,25 @@ const AgregarVehiculo = ({ onCancel, onSuccess }) => {
                 const formData = new FormData();
                 formData.append('file', file);
                 formData.append('upload_preset', 'unsigned_preset');
-    
+
                 const response = await axios.post(
                     'https://api.cloudinary.com/v1_1/dmyubpur2/image/upload',
                     formData
                 );
-    
+
                 const imageUrl = response.data.secure_url; // URL de la imagen subida
-    
+
                 // Extraer solo el public_id de la URL completa
                 const imageParts = imageUrl.split('/');
                 imagePublicId = `${imageParts[imageParts.length - 2]}/${imageParts[imageParts.length - 1]}`;
             }
-    
+
             // Guardar los datos del vehículo y el public_id de la imagen (si existe)
             const updatedUserData = {
                 ...userData,
                 fotoV: imagePublicId || 'Sin foto',
             };
-    
+
             await agregarVehiculo(updatedUserData, onSuccess);
             setLoading(false);
             onCancel(); // Cerrar el formulario después de guardar
@@ -99,6 +100,22 @@ const AgregarVehiculo = ({ onCancel, onSuccess }) => {
                     />
                 </div>
                 <div className="form-group col-md-6">
+                    <label htmlFor="codigo">Código</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="codigo"
+                        name="codigo"
+                        value={userData.codigo}
+                        onChange={handleChange}
+                        maxLength={50}
+                    />
+                </div>
+            </div>
+
+            <div className="form-row">
+               
+                <div className="form-group col-md-6">
                     <label htmlFor="fotoV">Foto del Vehículo</label>
                     <input
                         type="file"
@@ -125,6 +142,7 @@ const ActualizarVehiculo = ({ vehiculo, onUpdate, onCancel }) => {
     const { actualizarVehiculo, loading } = useActualizarVehiculo();
     const [userData, setUserData] = useState({
         placa: vehiculo.placa || '',
+        codigo: vehiculo.codigo || '',
         fotoV: vehiculo.fotoV || 'Sin foto',
     });
     const [file, setFile] = useState(null);
@@ -153,13 +171,13 @@ const ActualizarVehiculo = ({ vehiculo, onUpdate, onCancel }) => {
                     'https://api.cloudinary.com/v1_1/dmyubpur2/image/upload',
                     formData
                 );
-                
+
                 const imageUrl = response.data.secure_url;
-                
+
                 // Extraer solo el public_id de la URL
                 const imageParts = imageUrl.split('/');
                 const imagePublicId = `${imageParts[imageParts.length - 2]}/${imageParts[imageParts.length - 1]}`;
-                
+
                 updatedUserData = { ...updatedUserData, fotoV: imagePublicId }; // Actualizar solo la foto con el public_id
             }
 
@@ -188,6 +206,22 @@ const ActualizarVehiculo = ({ vehiculo, onUpdate, onCancel }) => {
                     />
                 </div>
                 <div className="form-group col-md-6">
+                    <label htmlFor="codigo">Código</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="codigo"
+                        name="codigo"
+                        value={userData.codigo}
+                        onChange={handleChange}
+                        maxLength={50}
+                    />
+                </div>
+
+            </div>
+            <div className="form-row">
+
+                <div className="form-group col-md-6">
                     <label htmlFor="fotoV">Foto del Vehículo</label>
                     <input
                         type="file"
@@ -196,8 +230,16 @@ const ActualizarVehiculo = ({ vehiculo, onUpdate, onCancel }) => {
                         accept="image/*"
                     />
                 </div>
-            </div>
 
+                <div className="form-group col-md-6">
+                    <label htmlFor="fotoV">Foto actual del vehículo </label> <br />
+                    <img
+                        src={"https://res.cloudinary.com/dmyubpur2/image/upload/" + vehiculo.fotoV}
+                        alt="Foto del vehículo"
+                        style={{ width: '150px', height: '150px', objectFit: 'cover' }}
+                    />
+                </div>
+            </div>
             <button type="submit" className="btn btn-primary" disabled={loading}>
                 {loading ? 'Actualizando...' : 'Actualizar'}
             </button>
@@ -236,12 +278,17 @@ const EliminarVehiculo = ({ vehiculo, onDelete, onCancel }) => {
                     />
                 </div>
                 <div className="form-group col-md-6">
-                
-                    <img
-                            src={"https://res.cloudinary.com/dmyubpur2/image/upload/"+vehiculo.fotoV}
-                            alt="Foto del vehículo"
-                            style={{ width: '150px', height: '150px', objectFit: 'cover' }}
-                        />
+                    <label htmlFor="placa">Código</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="placa"
+                        name="placa"
+                        value={vehiculo.codigo}
+                        required
+                        disabled
+                        maxLength={50}
+                    />
                 </div>
             </div>
             <div className="form-row">
@@ -269,6 +316,14 @@ const EliminarVehiculo = ({ vehiculo, onDelete, onCancel }) => {
                         disabled
                     />
                 </div>
+            </div>
+            <div className="form-group col-md-6">
+
+                <img
+                    src={"https://res.cloudinary.com/dmyubpur2/image/upload/" + vehiculo.fotoV}
+                    alt="Foto del vehículo"
+                    style={{ width: '150px', height: '150px', objectFit: 'cover' }}
+                />
             </div>
             <button type="button" className="btn btn-danger" onClick={handleDelete} disabled={loading}>
                 {loading ? 'Eliminando...' : 'Eliminar'}
@@ -327,7 +382,7 @@ const HistorialVehiculo = ({ vehiculoId, onCancel }) => {
                     infoFiltered: '(filtrado de _MAX_ registros en total)',
                     search: 'Buscar:',
                 },
-                order: [[4, 'desc'], [5, 'desc']], // Ordenar por fecha y hora
+                order: [[7, 'desc'], [8, 'desc']], // Ordenar por fecha y hora
             });
         }
     }, [historial]);
@@ -349,6 +404,7 @@ const HistorialVehiculo = ({ vehiculoId, onCancel }) => {
                                     <th>Nombre de persona</th>
                                     <th>Foto de la persona</th>
                                     <th>Placa</th>
+                                    <th>Código</th>
                                     <th>Foto Vehículo</th>
                                     <th>Estado</th>
                                     <th>Usuario</th>
@@ -362,15 +418,16 @@ const HistorialVehiculo = ({ vehiculoId, onCancel }) => {
                                         <td>{item.persona?.nombre || item.nombre}</td>
                                         <td>
                                             {item.persona?.fotoP ? (
-                                                <img src={"https://res.cloudinary.com/dmyubpur2/image/upload/"+item.persona.fotoP} alt="Foto Persona" style={{ width: '60px', height: '60px', objectFit: 'cover' }} />
+                                                <img src={"https://res.cloudinary.com/dmyubpur2/image/upload/" + item.persona.fotoP} alt="Foto Persona" style={{ width: '60px', height: '60px', objectFit: 'cover' }} />
                                             ) : (
                                                 'Invitado'
                                             )}
                                         </td>
                                         <td>{item.vehiculo?.placa || item.placa}</td>
+                                        <td>{item.vehiculo.codigo ? item.vehiculo.codigo : "Sin código"}</td>
                                         <td>
                                             {item.vehiculo?.fotoV ? (
-                                                <img src={"https://res.cloudinary.com/dmyubpur2/image/upload/"+item.vehiculo.fotoV} alt="Foto vehículo" style={{ width: '60px', height: '60px', objectFit: 'cover' }} />
+                                                <img src={"https://res.cloudinary.com/dmyubpur2/image/upload/" + item.vehiculo.fotoV} alt="Foto vehículo" style={{ width: '60px', height: '60px', objectFit: 'cover' }} />
                                             ) : (
                                                 'Invitado'
                                             )}
@@ -402,7 +459,7 @@ const ActualizarFechaPago = ({ vehiculo, onUpdate, onCancel }) => {
 
     // Actualiza la fecha de pago inicial del vehículo o la fecha actual si no está disponible
     useEffect(() => {
-        const fechaActual =  new Date();
+        const fechaActual = new Date();
         const fechaFormateada = format(fechaActual, 'dd/MM/yyyy'); // Ajusta el formato según lo que prefieras
         setFechaPago(fechaFormateada);
     }, [vehiculo.fecha]);
@@ -414,7 +471,7 @@ const ActualizarFechaPago = ({ vehiculo, onUpdate, onCancel }) => {
 
             await actualizarVehiculo(vehiculo._id, { fecha: fechaActual, pagado: true }, onUpdate);
             toast.success('Fecha de pago actualizada correctamente');
-            onUpdate(); 
+            onUpdate();
         } catch (error) {
             console.error('Error actualizando la fecha de pago:', error);
             toast.error('Error actualizando la fecha de pago');
@@ -425,33 +482,34 @@ const ActualizarFechaPago = ({ vehiculo, onUpdate, onCancel }) => {
         <>
 
             <div className="modal-content">
-                
+
                 <h3>Confirmación de Pago</h3>
                 {/* Mostrar la información de la placa y la foto */}
                 <br />
                 <center>
-                <div className="vehiculo-info">
-                    <h5> <p><strong>Placa:</strong> {vehiculo.placa}</p></h5>
+                    <div className="vehiculo-info">
+                        <h5> <p><strong>Placa:</strong> {vehiculo.placa}</p></h5>
+                        <h5> <p><strong>Código:</strong>{vehiculo.codigo ? vehiculo.codigo : "Sin código"}</p></h5>
 
-                    <br />
-                    <div className="vehiculo-foto">
-                        <img
-                            src={"https://res.cloudinary.com/dmyubpur2/image/upload/"+vehiculo.fotoV}
-                            alt="Foto del vehículo"
-                            style={{ width: '200px', height: '200px', objectFit: 'cover' }}
-                        />
+                        <br />
+                        <div className="vehiculo-foto">
+                            <img
+                                src={"https://res.cloudinary.com/dmyubpur2/image/upload/" + vehiculo.fotoV}
+                                alt="Foto del vehículo"
+                                style={{ width: '200px', height: '200px', objectFit: 'cover' }}
+                            />
+                        </div>
                     </div>
-                </div>
-                <div className="form-group">
+                    <div className="form-group">
                         <h5><label htmlFor="fechaPago">Fecha de Pago:</label></h5>
                         <h5>{fechaPago}</h5>
                     </div>
-              </center>
+                </center>
                 <br />
                 <form onSubmit={handleSubmit}>
-                    
+
                     <div className="modal-footer">
-                      
+
                         <button type="submit" className="btn btn-primary">
                             Guardar
                         </button>
@@ -513,7 +571,7 @@ const Vehiculos = () => {
                     zeroRecords: 'No se encontraron registros que coincidan',
                 }
             });
-            
+
 
         }
     }, [vehiculos]);
@@ -641,10 +699,10 @@ const Vehiculos = () => {
                                             <thead>
                                                 <tr>
                                                     <th>Placa</th>
+                                                    <th>Código</th>
                                                     <th>Foto</th>
                                                     <th>Pagado</th>
                                                     <th>Fecha de pago</th>
-                                                 
                                                     <th>Opciones</th>
                                                 </tr>
                                             </thead>
@@ -652,10 +710,11 @@ const Vehiculos = () => {
                                                 {vehiculos.map((vehiculo, index) => (
                                                     <tr key={index}>
                                                         <td>{vehiculo.placa}</td>
+                                                        <td>{vehiculo.codigo ? vehiculo.codigo : "Sin código"}</td>
                                                         <td>
                                                             {vehiculo.fotoV !== 'Sin foto' ? (
                                                                 <img
-                                                                    src={"https://res.cloudinary.com/dmyubpur2/image/upload/"+vehiculo.fotoV}
+                                                                    src={"https://res.cloudinary.com/dmyubpur2/image/upload/" + vehiculo.fotoV}
                                                                     alt="Foto del vehiculo"
                                                                     style={{ width: '50px', height: '50px', objectFit: 'cover' }}
                                                                 />
@@ -669,7 +728,7 @@ const Vehiculos = () => {
                                                                 ? format(new Date(new Date(vehiculo.fecha).toUTCString().slice(0, -3)), 'dd/MM/yyyy')
                                                                 : 'No pagado'}
                                                         </td>
-                                                    
+
                                                         <td className="text-center">
                                                             <div className="dropdown">
                                                                 <Dropdown>
