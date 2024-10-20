@@ -190,6 +190,7 @@ console.log(addedCards)
     </div>
   )}
 </div>
+<br /><br /><br /><br />
 
 
           <div className="mt-5 pt-3 container" style={{ width: '100%' }}>
