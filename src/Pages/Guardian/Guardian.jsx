@@ -154,31 +154,43 @@ console.log(addedCards)
           {(loadingPersonas || loadingVehiculos) && <p>Buscando...</p>}
           <br />
           <div className="mt-5 pt-5 container flex-grow-1">
-            {addedCards.length > 0 && (
-              <div className="added-cards">
-                <div className="row">
-                  {addedCards.map((card) => (
-                    <div key={card.id} className="col mb-2 w-100 d-flex mb-3">
-                      <div className={`card added-card`}>
-                        <div className="card-body">
-                          <h5 className="card-title">{card.nombre || card.placa}</h5>
-                          <h6 className="card-title">{"DPI: "+card.DPI ||"Código: "+ card.codigo}</h6>
-                          <img
-                            className='imagen'
-                            src={card.fotoP 
-                              ? "https://res.cloudinary.com/dmyubpur2/image/upload/" + card.fotoP 
-                              : "https://res.cloudinary.com/dmyubpur2/image/upload/" + card.fotoV}
-                            alt={`Sin foto`}
-                            style={{ width: '90px', height: '90px', objectFit: 'cover' }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+  {addedCards.length > 0 && (
+    <div className="added-cards">
+      <div className="row">
+        {addedCards.map((card) => (
+          <div key={card.id} className="col mb-2 w-100 d-flex mb-3">
+            <div className={`card added-card`}>
+              <div className="card-body d-flex align-items-center">
+                
+                {/* Contenedor del texto: ocupa el 50% */}
+                <div style={{ width: '50%' }}>
+                  <h5 className="card-title">{card.nombre || card.placa}</h5>
+                  <h6 className="card-title">
+                    {card.DPI ? "DPI: " + card.DPI : "Código: " + card.codigo}
+                  </h6>
                 </div>
+                
+                {/* Contenedor de la imagen: ocupa el otro 50% */}
+                <div style={{ width: '50%', textAlign: 'right' }}>
+                  <img
+                    className='imagen'
+                    src={card.fotoP 
+                      ? "https://res.cloudinary.com/dmyubpur2/image/upload/" + card.fotoP 
+                      : "https://res.cloudinary.com/dmyubpur2/image/upload/" + card.fotoV}
+                    alt={`Sin foto`}
+                    style={{ width: '90px', height: '90px', objectFit: 'cover' }}
+                  />
+                </div>
+
               </div>
-            )}
+            </div>
           </div>
+        ))}
+      </div>
+    </div>
+  )}
+</div>
+
 
           <div className="mt-5 pt-3 container" style={{ width: '100%' }}>
   <div className="row">
