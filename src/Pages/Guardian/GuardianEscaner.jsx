@@ -302,25 +302,25 @@ const GuardianEscaner = () => {
 {isPersonFound && persona && (
   <div
     className="card mt-5"
-    style={scannedVehiculoId ? { width: '98%', height: '15%' } : { width: '98%', height: 'auto' }}
+    style={{ width: '98%' }}  // Elimina la altura fija
   >
     <div
       className={scannedVehiculoId
         ? 'card-body d-flex align-items-center justify-content-between'
         : 'card-body d-flex flex-column align-items-center'
       }
-      style={{ height: '100%' }}
+      style={{ height: 'auto' }} // Asegura que la altura se ajuste al contenido
     >
       <div
         className={`${scannedVehiculoId ? 'text-left' : 'text-center'}`}
-        style={scannedVehiculoId ? { width: '50%' } : { width: '100%' }} // Aseguramos que el texto ocupe la mitad del espacio
+        style={scannedVehiculoId ? { width: '50%' } : { width: '100%' }} // El texto ocupa la mitad si hay vehículo
       >
         <h5 className="card-title mb-0">{persona.nombre}</h5>
         <h6 className="mt-2">DPI: {persona.DPI}</h6>
       </div>
-      
+
       {scannedVehiculoId ? (
-        <div className="text-right" style={{ width: '50%' }}> {/* Aseguramos que la imagen ocupe el otro 50% */}
+        <div className="text-right" style={{ width: '50%' }}> {/* La imagen ocupa el otro 50% */}
           <img
             className="imagen"
             src={"https://res.cloudinary.com/dmyubpur2/image/upload/" + persona.fotoP || 'Sin foto'}
@@ -341,6 +341,7 @@ const GuardianEscaner = () => {
     </div>
   </div>
 )}
+
 
 
           {isPersonFound && scannedVehiculoId && vehiculo && (
