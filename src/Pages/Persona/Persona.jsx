@@ -271,6 +271,14 @@ const ActualizarPersona = ({ user, onUpdate, onCancel }) => {
           <input type="file" className="form-control" onChange={handleFileChange} />
         </div>
       </div>
+      <div className="form-group col-md-6">
+                    <label htmlFor="fotoV">Foto actual de la persona </label> <br />
+                    <img
+                        src={"https://res.cloudinary.com/dmyubpur2/image/upload/" + userData.fotoP}
+                        alt="Foto del vehículo"
+                        style={{ width: '150px', height: '150px', objectFit: 'cover' }}
+                    />
+                </div>
       <button type="submit" className="btn btn-primary" disabled={loading}>
         {loading ? 'Actualizando...' : 'Actualizar'}
       </button>
@@ -340,7 +348,7 @@ const EliminarPersona = ({ user, onDelete, onCancel }) => {
         </div>
         <div className="form-group col-md-6">
 
-          <img src={"https://res.cloudinary.com/dmyubpur2/image/upload/"+user.fotoP} alt="Foto de la persona" style={{ width: '100px', height: '100px' }} />
+          <img src={"https://res.cloudinary.com/dmyubpur2/image/upload/"+user.fotoP} alt="Foto de la persona" style={{ width: '150px', height: '150px', objectFit: 'cover' }} />
         </div>
       </div>
       <button type="button" className="btn btn-danger" onClick={handleDelete} disabled={loading}>
