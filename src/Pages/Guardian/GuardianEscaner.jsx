@@ -302,7 +302,7 @@ const GuardianEscaner = () => {
 {isPersonFound && persona && (
   <div
     className="card mt-5"
-    style={scannedVehiculoId ? { width: '98%', height: '15%' } : { width: '98%', height: 'auto' }}
+    style={scannedVehiculoId ? { width: '98%', height: '18%' } : { width: '98%', height: 'auto' }}
   >
     <div
       className={scannedVehiculoId
@@ -313,7 +313,7 @@ const GuardianEscaner = () => {
     >
       <div
         className={`${scannedVehiculoId ? 'text-left' : 'text-center'}`}
-        style={scannedVehiculoId ? { width: '60%' } : { width: '100%' }} // Aseguramos que el texto ocupe la mitad del espacio
+        style={scannedVehiculoId ? { width: '65%' } : { width: '100%' }} // Aseguramos que el texto ocupe la mitad del espacio
       >
         <h5 className="card-title mb-0">{persona.nombre}</h5>
         <h6 className="mt-2">DPI: {persona.DPI}</h6>
