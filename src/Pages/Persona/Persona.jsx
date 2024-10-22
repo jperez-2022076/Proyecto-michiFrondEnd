@@ -92,7 +92,7 @@ const AgregarPersona = ({ onCancel, onSuccess }) => {
     } catch (error) {
         console.error('Error al subir la imagen:', error);
         toast.error('Error al subir la imagen. Por favor, inténtalo de nuevo.');
-        setLoading(false);
+          setLoading(false);
     }
 };
 
@@ -153,13 +153,14 @@ const AgregarPersona = ({ onCancel, onSuccess }) => {
 
 
 const ActualizarPersona = ({ user, onUpdate, onCancel }) => {
-  const { actualizarPersona, loading } = useActualizarPersona();
+  const { actualizarPersona } = useActualizarPersona();
   const [userData, setUserData] = useState({
     nombre: user.nombre || '',
     telefono: user.telefono || '',
     DPI: user.DPI || '',
     fotoP: user.fotoP || ''
   });
+  const [loading, setLoading] = useState(false);
   const [file, setFile] = useState(null);
 
   const handleChange = (e) => {
@@ -187,7 +188,7 @@ const ActualizarPersona = ({ user, onUpdate, onCancel }) => {
         toast.error("El DPI debe contener solo números y tener entre 12 y 13 dígitos.");
         return;
     }
-
+    setLoading(true);
     try {
         let updatedUserData = { ...userData };
 
@@ -211,10 +212,11 @@ const ActualizarPersona = ({ user, onUpdate, onCancel }) => {
 
         // Llamar al servicio que actualiza la persona
         await actualizarPersona(user._id, updatedUserData, onUpdate);
-
+        setLoading(false);
     } catch (error) {
         console.error('Error al actualizar la persona:', error);
         toast.error('Error al actualizar la persona. Por favor, inténtalo de nuevo.');
+        setLoading(false);
     }
   }
 

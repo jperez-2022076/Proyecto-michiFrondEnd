@@ -139,7 +139,8 @@ const AgregarVehiculo = ({ onCancel, onSuccess }) => {
 
 // Componente para actualizar vehículo
 const ActualizarVehiculo = ({ vehiculo, onUpdate, onCancel }) => {
-    const { actualizarVehiculo, loading } = useActualizarVehiculo();
+    const { actualizarVehiculo } = useActualizarVehiculo();
+    const [loading, setLoading] = useState(false);
     const [userData, setUserData] = useState({
         placa: vehiculo.placa || '',
         codigo: vehiculo.codigo || '',
@@ -158,6 +159,8 @@ const ActualizarVehiculo = ({ vehiculo, onUpdate, onCancel }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        setLoading(true);
         try {
             let updatedUserData = { ...userData };
 
@@ -183,8 +186,10 @@ const ActualizarVehiculo = ({ vehiculo, onUpdate, onCancel }) => {
 
             // Llamada para actualizar el vehículo
             await actualizarVehiculo(vehiculo._id, updatedUserData, onUpdate);
+            setLoading(false);
         } catch (error) {
             console.error('Error al actualizar el vehículo:', error);
+            setLoading(false);
         }
     };
 
