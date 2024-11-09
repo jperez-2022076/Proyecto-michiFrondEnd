@@ -56,7 +56,14 @@ const Sidebar = ({ isSidebarVisible }) => {
                 <span> Historial De Personas</span>
               </button>
             </li>
-
+            <hr className="sidebar-divider my-0" />
+            <li className="nav-item">
+              <button className="nav-link" onClick={() => navigate('/Guardian')}>
+                <FontAwesomeIcon icon={faTruck} />
+                <span> Buscar por escaner</span>
+              </button>
+            </li>
+            <hr className="sidebar-divider my-0" />
             <div className="sidebar-heading">Administrar</div>
             <hr className="sidebar-divider my-0" />
 
@@ -86,8 +93,6 @@ const Sidebar = ({ isSidebarVisible }) => {
           </>
         ) :
         <>
-         {/* Nav Item - Historial de Vehiculos */}
-            {/* Nav Item - Historial de Vehiculos */}
             <li className="nav-item">
               <button className="nav-link" onClick={() => navigate('/Guardian')}>
                 <FontAwesomeIcon icon={faTruck} />
@@ -101,7 +106,6 @@ const Sidebar = ({ isSidebarVisible }) => {
               </button>
             </li>
 </>
-        
         }
          
         {/* Este div vacío se expande y empuja el botón de cerrar sesión hacia abajo */}
