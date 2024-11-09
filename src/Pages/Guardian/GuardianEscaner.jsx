@@ -38,7 +38,7 @@ const GuardianEscaner = () => {
     }
   
     const newTimeoutId = setTimeout(() => {
-      const id = isMobile ? data.split('').reverse().join('') : data;
+      const id =  data;
   
       if (id.startsWith('Invitado')) {
         setScannedId(id);
