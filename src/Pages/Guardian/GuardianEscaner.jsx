@@ -20,7 +20,7 @@ const GuardianEscaner = () => {
   const [scannedVehiculoId, setScannedVehiculoId] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
   const [showGuestForm, setShowGuestForm] = useState(false); // Para controlar la visibilidad del formulario de invitado
-  const [guestData, setGuestData] = useState({ nombre: '', dpi: '', placa: '' }); // Datos del invitado
+  const [guestData, setGuestData] = useState({ nombre: '', dpi: '', placa: '', cliente: '' }); // Datos del invitado
   const [isGuestDataRetrieved, setIsGuestDataRetrieved] = useState(false); 
   const { data: persona, loading: loadingPersona, error: errorPersona, isSuccess: isPersonSuccess } = useBuscarPersonaId(scannedId);
   const { data: vehiculo, loading: loadingVehiculo, error: errorVehiculo } = useBuscarVehiculoId(scannedVehiculoId);
@@ -38,7 +38,7 @@ const GuardianEscaner = () => {
     }
   
     const newTimeoutId = setTimeout(() => {
-      const id = data;
+      const id = isMobile ? data.split('').reverse().join('') : data;
   
       if (id.startsWith('Invitado')) {
         setScannedId(id);
@@ -49,7 +49,7 @@ const GuardianEscaner = () => {
           setGuestData(storedGuestData);
           setIsGuestDataRetrieved(true)
         } else {
-          setGuestData({ nombre: '', dpi: '', placa: '' }); // Reiniciar los datos si no existen
+          setGuestData({ nombre: '', dpi: '', placa: '', cliente: '' }); // Reiniciar los datos si no existen
           setIsGuestDataRetrieved(false)
         }
         
@@ -80,7 +80,7 @@ const GuardianEscaner = () => {
     const horaActual = moment().format('HH:mm:ss');  // Hora del dispositivo
   
     if (showGuestForm) {
-      if (!guestData.nombre || !guestData.dpi || !guestData.placa) {
+      if (!guestData.nombre || !guestData.dpi || !guestData.placa || !guestData.cliente) {
         toast.error('Por favor, completa todos los campos del invitado.');
         return; // Detener ejecución si los campos no están llenos
     }
@@ -89,6 +89,7 @@ const GuardianEscaner = () => {
         nombre: guestData.nombre,
         DPI: guestData.dpi,
         placa: guestData.placa,
+        cliente: guestData.cliente,
         usuario: usuarioId,
         fecha: fechaActual,
         hora: horaActual
@@ -162,7 +163,7 @@ const GuardianEscaner = () => {
     setInputValue('');
     setIsPersonFound(false);
     setShowGuestForm(false); // Oculta el formulario al reiniciar
-    setGuestData({ nombre: '', dpi: '', placa: '' }); // Resetear datos del invitado
+    setGuestData({ nombre: '', dpi: '', placa: '', cliente: '' }); // Resetear datos del invitado
     hiddenInputRef.current.value = '';
     hiddenInputRef.current.focus();
     setScanMessage('Escanea una persona...'); 
@@ -287,6 +288,17 @@ const GuardianEscaner = () => {
                     required
                   />
                 </div>
+                <input
+                    type="text"
+                    className="form-control"
+                    id="cliente"
+                    name="cliente"
+                    value={guestData.cliente}
+                    onChange={handleGuestInputChange}
+                    maxLength={150}
+                    
+                    required
+                  />
                 <div className="d-flex justify-content-end">
                   <button className="btn btn-success mr-2" onClick={handleSaveHistorial} disabled={isSavingHistorial || isSavingHistorialPV}>
                     {isSavingHistorial || isSavingHistorialPV ? 'Guardando...' : 'Guardar'}
