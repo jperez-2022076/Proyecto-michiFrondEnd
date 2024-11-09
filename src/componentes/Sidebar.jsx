@@ -56,14 +56,7 @@ const Sidebar = ({ isSidebarVisible }) => {
                 <span> Historial De Personas</span>
               </button>
             </li>
-            <hr className="sidebar-divider my-0" />
-            <li className="nav-item">
-              <button className="nav-link" onClick={() => navigate('/Guardian')}>
-                <FontAwesomeIcon icon={faTruck} />
-                <span> Buscar por escaner</span>
-              </button>
-            </li>
-            <hr className="sidebar-divider my-0" />
+       
             <div className="sidebar-heading">Administrar</div>
             <hr className="sidebar-divider my-0" />
 
@@ -90,6 +83,14 @@ const Sidebar = ({ isSidebarVisible }) => {
                 <span> Usuarios</span>
               </button>
             </li>
+            <hr className="sidebar-divider my-0" />
+            <li className="nav-item">
+              <button className="nav-link" onClick={() => navigate('/Guardian')}>
+                <FontAwesomeIcon icon={faTruck} />
+                <span> Buscar por escaner</span>
+              </button>
+            </li>
+            <hr className="sidebar-divider my-0" />
           </>
         ) :
         <>
