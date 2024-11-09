@@ -288,17 +288,19 @@ const GuardianEscaner = () => {
                     required
                   />
                 </div>
-                <input
+                <div className="form-group">
+                  <label htmlFor="cliente">Cliente</label>
+                  <input
                     type="text"
                     className="form-control"
                     id="cliente"
                     name="cliente"
                     value={guestData.cliente}
                     onChange={handleGuestInputChange}
-                    maxLength={150}
-                    
+                    maxLength={100}
                     required
                   />
+                </div>
                 <div className="d-flex justify-content-end">
                   <button className="btn btn-success mr-2" onClick={handleSaveHistorial} disabled={isSavingHistorial || isSavingHistorialPV}>
                     {isSavingHistorial || isSavingHistorialPV ? 'Guardando...' : 'Guardar'}
