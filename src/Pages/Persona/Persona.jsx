@@ -25,7 +25,8 @@ const AgregarPersona = ({ onCancel, onSuccess }) => {
     nombre: '',
     telefono: '',
     DPI: '',
-    fotoP: ''
+    fotoP: '',
+    cliente: ''
   });
   const [file, setFile] = useState(null); // Guardar el archivo seleccionado
   const [loading, setLoading] = useState(false);
@@ -105,6 +106,7 @@ const AgregarPersona = ({ onCancel, onSuccess }) => {
         <div className="form-group col-md-6">
           <label htmlFor="nombre">Nombre</label>
           <input
+            maxLength={100}
             type="text"
             className="form-control"
             id="nombre"
@@ -136,6 +138,20 @@ const AgregarPersona = ({ onCancel, onSuccess }) => {
           />
         </div>
         <div className="form-group col-md-6">
+          <label htmlFor="nombre">Cliente</label>
+          <input
+            maxLength={100}
+            type="text"
+            className="form-control"
+            id="cliente"
+            name="cliente"
+            value={userData.cliente}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div className="form-group col-md-6">
           <label htmlFor="fotoP">Foto</label>
           <input type="file" className="form-control" onChange={handleFileChange}  />
         </div>
@@ -158,7 +174,8 @@ const ActualizarPersona = ({ user, onUpdate, onCancel }) => {
     nombre: user.nombre || '',
     telefono: user.telefono || '',
     DPI: user.DPI || '',
-    fotoP: user.fotoP || ''
+    fotoP: user.fotoP || '',
+    cliente: user.cliente || ''
   });
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState(null);
@@ -228,6 +245,7 @@ const ActualizarPersona = ({ user, onUpdate, onCancel }) => {
         <div className="form-group col-md-6">
           <label htmlFor="nombre">Nombre</label>
           <input
+          maxLength={100}
             type="text"
             className="form-control"
             id="nombre"
@@ -264,6 +282,19 @@ const ActualizarPersona = ({ user, onUpdate, onCancel }) => {
         maxLength={13}
             required
               inputMode="numeric"
+          />
+        </div>
+        <div className="form-group col-md-6">
+          <label htmlFor="nombre">Cliente</label>
+          <input
+            type="text"
+            className="form-control"
+            id="cliente"
+            name="cliente"
+            maxLength={100}
+            value={userData.cliente}
+            onChange={handleChange}
+            required
           />
         </div>
         <div className="form-group col-md-6">
@@ -346,6 +377,20 @@ const EliminarPersona = ({ user, onDelete, onCancel }) => {
               inputMode="numeric"
           />
         </div>
+        <div className="form-group col-md-6">
+          <label htmlFor="nombre">Cliente</label>
+          <input
+            type="text"
+            className="form-control"
+            id="cliente"
+            name="cliente"
+            value={user.cliente}
+            required
+            disabled
+          />
+        </div>
+
+
         <div className="form-group col-md-6">
 
           <img src={"https://res.cloudinary.com/dmyubpur2/image/upload/"+user.fotoP} alt="Foto de la persona" style={{ width: '150px', height: '150px', objectFit: 'cover' }} />
@@ -577,6 +622,7 @@ const Personas = () => {
                       <tr>
                         <th>Nombre</th>
                         <th>Teléfono</th>
+                        <th>Cliente</th>
                         <th style={{ textAlign: 'left' }}>DPI</th>
                         <th>Foto</th>
                         <th>Opciones</th>
@@ -587,6 +633,7 @@ const Personas = () => {
                         <tr key={index}>
                           <td>{persona.nombre}</td>
                           <td>{persona.telefono}</td>
+                          <td>{persona.cliente ? persona.cliente : "Sin cliente"}</td>
                           <td style={{ textAlign: 'left' }}>{persona.DPI}</td>
                           <td>
                             {persona.fotoP !== 'Sin foto' ? (

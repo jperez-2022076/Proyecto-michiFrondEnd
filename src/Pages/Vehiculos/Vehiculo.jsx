@@ -19,8 +19,8 @@ import useListarHistorialVehiculo from '../../shared/hooks/Vehiculo/VehiculoHist
 import { format } from 'date-fns';
 import moment from 'moment';
 
-
 import { Dropdown } from 'react-bootstrap';
+
 
 // Componente para agregar vehículo
 const AgregarVehiculo = ({ onCancel, onSuccess }) => {
@@ -29,8 +29,10 @@ const AgregarVehiculo = ({ onCancel, onSuccess }) => {
         placa: '',
         codigo: '',
         fotoV: '',
+        tarjetaCirculacion: ''
     });
-    const [file, setFile] = useState(null);
+    const [file, setFile] = useState(null);          // Para la imagen
+    const [pdfFile, setPdfFile] = useState(null);     // Para el PDF
     const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
@@ -40,6 +42,10 @@ const AgregarVehiculo = ({ onCancel, onSuccess }) => {
 
     const handleFileChange = (e) => {
         setFile(e.target.files[0]);
+    };
+
+    const handlePdfChange = (e) => {
+        setPdfFile(e.target.files[0]);
     };
 
     const handleSubmit = async (e) => {
@@ -52,32 +58,48 @@ const AgregarVehiculo = ({ onCancel, onSuccess }) => {
             if (file) {
                 const formData = new FormData();
                 formData.append('file', file);
-                formData.append('upload_preset', 'unsigned_preset');
+                formData.append('upload_preset', 'unsigned_preset'); // Cambia a tu preset si es necesario
 
                 const response = await axios.post(
                     'https://api.cloudinary.com/v1_1/dmyubpur2/image/upload',
                     formData
                 );
 
-                const imageUrl = response.data.secure_url; // URL de la imagen subida
-
-                // Extraer solo el public_id de la URL completa
+                const imageUrl = response.data.secure_url;
                 const imageParts = imageUrl.split('/');
                 imagePublicId = `${imageParts[imageParts.length - 2]}/${imageParts[imageParts.length - 1]}`;
             }
 
-            // Guardar los datos del vehículo y el public_id de la imagen (si existe)
+            // Subir el PDF a Cloudinary si se ha seleccionado uno
+            let pdfPublicId = '';
+            if (pdfFile) {
+                const formData = new FormData();
+                formData.append('file', pdfFile);
+                formData.append('upload_preset', 'unsigned_preset'); // Cambia a tu preset si es necesario
+
+                const response = await axios.post(
+                    'https://api.cloudinary.com/v1_1/dmyubpur2/raw/upload', // Cambia "raw" para subir archivos sin formato como PDF
+                    formData
+                );
+
+                const pdfUrl = response.data.secure_url;
+                const pdfParts = pdfUrl.split('/');
+                pdfPublicId = `${pdfParts[pdfParts.length - 2]}/${pdfParts[pdfParts.length - 1]}`;
+            }
+
+            // Guardar los datos del vehículo, el public_id de la imagen y el public_id del PDF
             const updatedUserData = {
                 ...userData,
                 fotoV: imagePublicId || 'Sin foto',
+                tarjetaCirculacion: pdfPublicId || 'Sin PDF'
             };
 
             await agregarVehiculo(updatedUserData, onSuccess);
             setLoading(false);
             onCancel(); // Cerrar el formulario después de guardar
         } catch (error) {
-            console.error('Error al subir la imagen:', error);
-            toast.error('Error al subir la imagen. Por favor, inténtalo de nuevo.'); // Mensaje de error
+            console.error('Error al subir la imagen o el PDF:', error);
+            toast.error('Error al subir la imagen o el PDF. Por favor, inténtalo de nuevo.');
             setLoading(false);
         }
     };
@@ -114,7 +136,6 @@ const AgregarVehiculo = ({ onCancel, onSuccess }) => {
             </div>
 
             <div className="form-row">
-               
                 <div className="form-group col-md-6">
                     <label htmlFor="fotoV">Foto del Vehículo</label>
                     <input
@@ -122,6 +143,15 @@ const AgregarVehiculo = ({ onCancel, onSuccess }) => {
                         className="form-control"
                         onChange={handleFileChange}
                         accept="image/*"
+                    />
+                </div>
+                <div className="form-group col-md-6">
+                    <label htmlFor="tarjetaCirculacion">Tarjeta de Circulación (PDF)</label>
+                    <input
+                        type="file"
+                        className="form-control"
+                        onChange={handlePdfChange}
+                        accept="application/pdf"
                     />
                 </div>
             </div>
@@ -145,8 +175,10 @@ const ActualizarVehiculo = ({ vehiculo, onUpdate, onCancel }) => {
         placa: vehiculo.placa || '',
         codigo: vehiculo.codigo || '',
         fotoV: vehiculo.fotoV || 'Sin foto',
+        tarjetaCirculacion: vehiculo.tarjetaCirculacion || 'Sin PDF'
     });
-    const [file, setFile] = useState(null);
+    const [file, setFile] = useState(null);          
+    const [pdfFile, setPdfFile] = useState(null);      
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -157,10 +189,14 @@ const ActualizarVehiculo = ({ vehiculo, onUpdate, onCancel }) => {
         setFile(e.target.files[0]);
     };
 
+    const handlePdfChange = (e) => {
+        setPdfFile(e.target.files[0]);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         setLoading(true);
+
         try {
             let updatedUserData = { ...userData };
 
@@ -176,15 +212,30 @@ const ActualizarVehiculo = ({ vehiculo, onUpdate, onCancel }) => {
                 );
 
                 const imageUrl = response.data.secure_url;
-
-                // Extraer solo el public_id de la URL
                 const imageParts = imageUrl.split('/');
                 const imagePublicId = `${imageParts[imageParts.length - 2]}/${imageParts[imageParts.length - 1]}`;
 
-                updatedUserData = { ...updatedUserData, fotoV: imagePublicId }; // Actualizar solo la foto con el public_id
+                updatedUserData = { ...updatedUserData, fotoV: imagePublicId };
             }
 
-            // Llamada para actualizar el vehículo
+            // Si hay un nuevo PDF, subirlo a Cloudinary
+            if (pdfFile) {
+                const formData = new FormData();
+                formData.append('file', pdfFile);
+                formData.append('upload_preset', 'unsigned_preset');
+
+                const response = await axios.post(
+                    'https://api.cloudinary.com/v1_1/dmyubpur2/raw/upload', // Cambia a "raw" para archivos PDF
+                    formData
+                );
+
+                const pdfUrl = response.data.secure_url;
+                const pdfParts = pdfUrl.split('/');
+                const pdfPublicId = `${pdfParts[pdfParts.length - 2]}/${pdfParts[pdfParts.length - 1]}`;
+
+                updatedUserData = { ...updatedUserData, tarjetaCirculacion: pdfPublicId };
+            }
+
             await actualizarVehiculo(vehiculo._id, updatedUserData, onUpdate);
             setLoading(false);
         } catch (error) {
@@ -222,10 +273,9 @@ const ActualizarVehiculo = ({ vehiculo, onUpdate, onCancel }) => {
                         maxLength={50}
                     />
                 </div>
-
             </div>
-            <div className="form-row">
 
+            <div className="form-row">
                 <div className="form-group col-md-6">
                     <label htmlFor="fotoV">Foto del Vehículo</label>
                     <input
@@ -235,16 +285,25 @@ const ActualizarVehiculo = ({ vehiculo, onUpdate, onCancel }) => {
                         accept="image/*"
                     />
                 </div>
-
                 <div className="form-group col-md-6">
-                    <label htmlFor="fotoV">Foto actual del vehículo </label> <br />
+                    <label htmlFor="tarjetaCirculacion">Tarjeta de Circulación (PDF)</label>
+                    <input
+                        type="file"
+                        className="form-control"
+                        onChange={handlePdfChange}
+                        accept="application/pdf"
+                    />
+                </div>
+            </div>
+            <div className="form-group col-md-6">
+                    <label htmlFor="fotoV">Foto actual del vehiculo </label> <br />
                     <img
-                        src={"https://res.cloudinary.com/dmyubpur2/image/upload/" + vehiculo.fotoV}
+                        src={"https://res.cloudinary.com/dmyubpur2/image/upload/" + userData.fotoV}
                         alt="Foto del vehículo"
                         style={{ width: '150px', height: '150px', objectFit: 'cover' }}
                     />
                 </div>
-            </div>
+
             <button type="submit" className="btn btn-primary" disabled={loading}>
                 {loading ? 'Actualizando...' : 'Actualizar'}
             </button>
@@ -254,7 +313,6 @@ const ActualizarVehiculo = ({ vehiculo, onUpdate, onCancel }) => {
         </form>
     );
 };
-
 
 const EliminarVehiculo = ({ vehiculo, onDelete, onCancel }) => {
     const { eliminarVehiculo, loading } = useEliminarVehiculo();
@@ -700,12 +758,13 @@ const Vehiculos = () => {
                                 </div>
                                 <div className="card-body">
                                     <div className="table-responsive">
-                                        <table ref={dataTableRef} className="table table-bordered" width="100%" cellSpacing="0">
+                                    <table ref={dataTableRef} className="table table-bordered" width="100%" cellSpacing="0">
                                             <thead>
                                                 <tr>
                                                     <th>Placa</th>
                                                     <th>Código</th>
                                                     <th>Foto</th>
+                                                    <th>Tarjeta de Circulación</th>
                                                     <th>Pagado</th>
                                                     <th>Fecha de pago</th>
                                                     <th>Opciones</th>
@@ -727,25 +786,34 @@ const Vehiculos = () => {
                                                                 'Sin foto'
                                                             )}
                                                         </td>
-                                                        <td>{vehiculo.pagado ? 'Pagado' : 'No pagado'}</td>
-                                                        <td>
-                                                            {vehiculo.fecha
-                                                                ? format(new Date(new Date(vehiculo.fecha).toUTCString().slice(0, -3)), 'dd/MM/yyyy')
-                                                                : 'No pagado'}
+                                                        <td className="text-center">
+                                                            {vehiculo.tarjetaCirculacion && vehiculo.tarjetaCirculacion !== 'Sin PDF' ? (
+                                                                <a
+                                                                    href={`https://res.cloudinary.com/dmyubpur2/raw/upload/${vehiculo.tarjetaCirculacion}`}
+                                                                    download
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                >
+                                                                    <FontAwesomeIcon icon={faFilePdf} style={{ fontSize: '30px', color: 'blue' }} />
+                                                                </a>
+                                                            ) : (
+                                                                'Sin PDF'
+                                                            )}
                                                         </td>
-
+                                                                    <td>{vehiculo.pagado ? 'Pagado' : 'No pagado'}</td>
+                                                        <td>
+                                                            {vehiculo.fecha ? formatDate(vehiculo.fecha) : 'No pagado'}
+                                                        </td>
                                                         <td className="text-center">
                                                             <div className="dropdown">
                                                                 <Dropdown>
                                                                     <Dropdown.Toggle variant="primary" id="dropdown-basic">
                                                                         Opciones
                                                                     </Dropdown.Toggle>
-
                                                                     <Dropdown.Menu>
                                                                         <Dropdown.Item onClick={() => toggleForm('update-payment', vehiculo)}>
                                                                             <FontAwesomeIcon icon={faCoins} className="mr-2" /> Ingresar Pago
                                                                         </Dropdown.Item>
-
                                                                         <Dropdown.Item onClick={() => toggleForm('edit', vehiculo)}>
                                                                             <FontAwesomeIcon icon={faEdit} className="mr-2" /> Editar
                                                                         </Dropdown.Item>
