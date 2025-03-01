@@ -106,6 +106,12 @@ const Sidebar = ({ isSidebarVisible }) => {
                 <span> Buscar por nombre</span>
               </button>
             </li>
+            <li className="nav-item">
+              <button className="nav-link" onClick={() => navigate('/GuardianTelefono')}>
+                <FontAwesomeIcon icon={faTruck} />
+                <span> Buscar por escaner telefono</span>
+              </button>
+            </li>
 </>
         }
          

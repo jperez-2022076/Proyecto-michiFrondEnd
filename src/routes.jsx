@@ -9,6 +9,7 @@ import HistorialP from './Pages/Historial/HistorialP';
 import HistorialPV from './Pages/Historial/HistorialPV';
 import Guardian from './Pages/Guardian/Guardian';
 import GuardianEscaner from './Pages/Guardian/GuardianEscaner';
+import GuardianEscanerTelefono from './Pages/Guardian/GuardianEscanerT';
 
 export const routes = [
     { path: "/", element: <Navigate to="/login" /> },
@@ -19,6 +20,7 @@ export const routes = [
     {path:"/HistorialP",element:<HistorialP/>},
     {path:"/HistorialPV",element:<HistorialPV/>},
     {path:"/GuardianPorNombre",element:<Guardian/>},
-    {path:"/Guardian",element:<GuardianEscaner/>}
+    {path:"/Guardian",element:<GuardianEscaner/>},
+    {path:"/GuardianTelefono",element:<GuardianEscanerTelefono/>}
   ];
   
