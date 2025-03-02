@@ -478,6 +478,8 @@ useEffect(() => {
             </div>
           )}
           <br />
+          <br />
+          <br />
           {isPersonFound && showButtons && !showGuestForm && (
             <div className="d-flex mt-3" style={{ position: 'absolute', bottom: '20px', left: '50%', transform: 'translateX(-50%)' }}>
               <button className="btn btn-success mr-2" onClick={handleSaveHistorial} disabled={isSavingHistorial || isSavingHistorialPV}>
