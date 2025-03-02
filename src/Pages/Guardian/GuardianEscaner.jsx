@@ -8,8 +8,33 @@ import useBuscarVehiculoId from '../../shared/hooks/Vehiculo/VehiculoBuscarId';
 import { useAgregarHistorialP } from '../../shared/hooks/HistorialP/HistorialPAgregar';
 import { useAgregarHistorialPV } from '../../shared/hooks/HistorialP/HistorialPVAgregar'; // Importar hook para historial PV
 import moment from 'moment';
+import axios from 'axios';
 
 const GuardianEscaner = () => {
+
+
+  useEffect(() => {
+    const descargarPersonas = async () => {
+      try {
+        const response = await axios.get('https://proyecto-michi.vercel.app/persona/descargarPersona', {
+          responseType: 'blob', 
+        });
+
+        const url = window.URL.createObjectURL(new Blob([response.data])); 
+        const a = document.createElement('a'); 
+        a.href = url;
+        a.download = 'personas.json'; 
+        document.body.appendChild(a);
+        a.click(); 
+        a.remove();
+        window.URL.revokeObjectURL(url); 
+      } catch (err) {
+        console.error('Error al descargar personas:', err);
+      }
+    };
+
+    descargarPersonas();
+  }, []);
   const hiddenInputRef = useRef(null);
   const [isSidebarVisible, setSidebarVisible] = useState(false);
   const [inputValue, setInputValue] = useState('');
