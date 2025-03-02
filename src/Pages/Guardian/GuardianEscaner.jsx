@@ -162,12 +162,13 @@ const GuardianEscaner = () => {
     setShowButtons(false);
     setInputValue('');
     setIsPersonFound(false);
-    setShowGuestForm(false); // Oculta el formulario al reiniciar
-    setGuestData({ nombre: '', dpi: '', placa: '', cliente: '' }); // Resetear datos del invitado
+    setShowGuestForm(false);
+    setGuestData({ nombre: '', dpi: '', placa: '', cliente: '' });
     hiddenInputRef.current.value = '';
     hiddenInputRef.current.focus();
-    setScanMessage('Escanea una persona...'); 
-  };
+    setScanMessage('Escanea una persona...');
+};
+
 
   const handleGuestInputChange = (e) => {
     const { name, value } = e.target;

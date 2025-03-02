@@ -9,16 +9,18 @@ import { useAgregarHistorialP } from '../../shared/hooks/HistorialP/HistorialPAg
 import { useAgregarHistorialPV } from '../../shared/hooks/HistorialP/HistorialPVAgregar'; // Importar hook para historial PV
 import moment from 'moment';
 import BarcodeScannerComponent from 'react-qr-barcode-scanner';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 const GuardianEscanerTelefono = () => {
   const [isCameraOpen, setIsCameraOpen] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
   const [hasCameraPermission, setHasCameraPermission] = useState(null);
   const [screenshot, setScreenshot] = useState(null);
   const [barcode, setBarcode] = useState(null);
-  const hiddenInputRef = useRef(null);
   const [isMobile, setIsMobile] = useState(false);
+  const hiddenInputRef = useRef(null);
   const [isSidebarVisible, setSidebarVisible] = useState(false);
+    const [showButtons, setShowButtons] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [timeoutId, setTimeoutId] = useState(null);
   const [scannedId, setScannedId] = useState(null);
@@ -50,61 +52,100 @@ const GuardianEscanerTelefono = () => {
       });
   };
 
-  const handleBarcodeScan = (data) => {
-    if (data) {
-      setBarcode(data.text);
-    }
-  };
-  useEffect(() => {
-    checkCameraPermissions();
-  }, []);
-
 
   //Este es el metodo que tengo que cambiar
+  const [isLoading, setIsLoading] = useState(false);
+  
   const handleHiddenInputChange = (e) => {
+    if (isLoading) return;
+
     const data = e.target.value;
-    setInputValue(data);
+    setIsLoading(true);
 
     if (timeoutId) {
-      clearTimeout(timeoutId);
+        clearTimeout(timeoutId);
     }
 
     const newTimeoutId = setTimeout(() => {
-      const id = data;
+        const id = data;
 
-      if (id.startsWith('Invitado')) {
-        setScannedId(id);
-
-        // Recuperar información del invitado si ya existe
-        const storedGuestData = JSON.parse(localStorage.getItem(id));
-        if (storedGuestData) {
-          setGuestData(storedGuestData);
-          setIsGuestDataRetrieved(true)
+        if (id.startsWith('Invitado')) {
+            const storedGuestData = JSON.parse(localStorage.getItem(id));
+            if (storedGuestData) {
+                setGuestData(storedGuestData);
+                setIsGuestDataRetrieved(true);
+            } else {
+                setGuestData({ nombre: '', dpi: '', placa: '', cliente: '' });
+                setIsGuestDataRetrieved(false);
+            }
+            setShowGuestForm(true);
+            setShowButtons(false);
         } else {
-          setGuestData({ nombre: '', dpi: '', placa: '', cliente: '' }); // Reiniciar los datos si no existen
-          setIsGuestDataRetrieved(false)
+              setIsPersonFound((prevIsPersonFound) => {
+                if (!prevIsPersonFound) {
+                    setScannedId(id);
+                    return true; 
+                } else {
+                    setScannedVehiculoId(id);
+                    
+                    return prevIsPersonFound; 
+                }
+            });
+            setShowButtons(true);
+            
         }
 
-        setShowGuestForm(true); // Mostrar el formulario para invitados
-        setShowButtons(false);
-        e.target.value = '';
         setInputValue('');
-      } else {
-        // Solo buscar personas si no es un invitado
-        if (!isPersonFound) {
-          setScannedId(id);
-        } else {
-          setScannedVehiculoId(id);
-        }
-      }
+        e.target.value = '';
 
-      setShowButtons(true);
-      e.target.value = '';
-      setInputValue('');
-    }, 300);
+        setIsLoading(false);
+    }, 1000);
 
     setTimeoutId(newTimeoutId);
-  };
+};
+
+const handleCancel = () => {
+  handleReset(); 
+};
+
+<input
+    type="text"
+    ref={hiddenInputRef}
+    style={{ position: 'absolute', left: '0', top: '0', width: '1px', height: '1px', opacity: 0.1 }}
+    value={inputValue}
+    onChange={handleHiddenInputChange}
+    autoFocus
+    disabled={isLoading}  // 🔴 Deshabilitar input si está cargando
+/>
+
+{isCameraOpen && (
+    <div style={{ marginBottom: '20px', width: '100%', maxWidth: '400px' }}>
+        <BarcodeScannerComponent
+            width="100%"
+            height="300px"
+            onUpdate={(err, result) => {
+                if (!isLoading && result) {  // 🔴 Evitar escaneo si está cargando
+                    handleHiddenInputChange({ target: { value: result.text } });
+                }
+            }}
+            stopStream={false}
+            onError={(err) => {
+                console.error('Error al usar la cámara:', err);
+                setErrorMessage('Error al usar la cámara.');
+            }}
+        />
+    </div>
+)}
+
+useEffect(() => {
+  if (vehiculo && Object.keys(vehiculo).length > 0) {
+    const timer = setTimeout(() => {
+      handleSaveHistorial();
+    }, 1000);
+
+    return () => clearTimeout(timer); 
+  }
+}, [vehiculo]);
 
   const handleSaveHistorial = async () => {
     const usuarioId = localStorage.getItem('id');
@@ -190,13 +231,14 @@ const GuardianEscanerTelefono = () => {
     setScannedVehiculoId(null);
     setShowButtons(false);
     setInputValue('');
-    setIsPersonFound(false);
-    setShowGuestForm(false); // Oculta el formulario al reiniciar
-    setGuestData({ nombre: '', dpi: '', placa: '', cliente: '' }); // Resetear datos del invitado
+    setIsPersonFound(false); 
+    setShowGuestForm(false);
+    setGuestData({ nombre: '', dpi: '', placa: '', cliente: '' });
     hiddenInputRef.current.value = '';
     hiddenInputRef.current.focus();
     setScanMessage('Escanea una persona...');
-  };
+};
+
 
   const handleGuestInputChange = (e) => {
     const { name, value } = e.target;
@@ -205,9 +247,7 @@ const GuardianEscanerTelefono = () => {
 
   useEffect(() => {
     if (isPersonSuccess) {
-      setIsPersonFound(true);
       setShowGuestForm(false); // Ocultar formulario si se encuentra a la persona
-
       setScanMessage('Escanea un vehículo...'); // Cambiar mensaje al encontrar persona
     }
   }, [isPersonSuccess, persona]);
@@ -245,6 +285,7 @@ const GuardianEscanerTelefono = () => {
       toast.error('Error al buscar persona.');
       setScannedId(null);
       setScannedVehiculoId(null);
+      setIsPersonFound(false)
     }
   }, [errorPersona]);
   useEffect(() => {
@@ -261,6 +302,24 @@ const GuardianEscanerTelefono = () => {
       <Sidebar isSidebarVisible={isSidebarVisible} />
       <div id="content-wrapper" className="d-flex flex-column full-height">
         <Navbar toggleSidebar={() => setSidebarVisible(!isSidebarVisible)} />
+        {isLoading && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',  // Gris oscuro semitransparente
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000  // Asegurar que esté encima de todo
+          }}>
+            <FontAwesomeIcon icon={faSpinner} spin size="3x" color="white" />
+          </div>
+        )}
+
+
 
 
 
@@ -279,9 +338,8 @@ const GuardianEscanerTelefono = () => {
                 width="100%"
                 height="300px"
                 onUpdate={(err, result) => {
-                  if (result) {
-                    console.log("Código escaneado:", result.text);
-                    handleHiddenInputChange({ target: { value: result.text } }); // Simula un evento de input
+                  if (!isLoading && result) { 
+                    handleHiddenInputChange({ target: { value: result.text } });
                   }
                 }}
                 stopStream={false}
@@ -290,6 +348,7 @@ const GuardianEscanerTelefono = () => {
                   setErrorMessage('Error al usar la cámara.');
                 }}
               />
+
 
             </div>
           )}
@@ -416,6 +475,17 @@ const GuardianEscanerTelefono = () => {
                 <h4 className="card-title">Código: {vehiculo.codigo ? vehiculo.codigo : "Sin código"}</h4>
                 <img className="persona-image" src={"https://res.cloudinary.com/dmyubpur2/image/upload/" + vehiculo.fotoV || 'Sin foto'} alt="Vehículo" style={{ width: '200px', height: '250px', objectFit: 'cover' }} />
               </div>
+            </div>
+          )}
+          <br />
+          {isPersonFound && showButtons && !showGuestForm && (
+            <div className="d-flex mt-3" style={{ position: 'absolute', bottom: '20px', left: '50%', transform: 'translateX(-50%)' }}>
+              <button className="btn btn-success mr-2" onClick={handleSaveHistorial} disabled={isSavingHistorial || isSavingHistorialPV}>
+                {isSavingHistorial || isSavingHistorialPV ? 'Guardando...' : 'Guardar'}
+              </button>
+              <button className="btn btn-danger" onClick={handleCancel}>
+                Cancelar
+              </button>
             </div>
           )}
 

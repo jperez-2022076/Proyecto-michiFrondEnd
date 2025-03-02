@@ -14,7 +14,7 @@ import Sidebar from '../../componentes/Sidebar';
 import Navbar from '../../componentes/Navbar';
 import { Dropdown } from 'react-bootstrap';
 import { listarHistorialP } from '../../services/api';
-import { constructFromSymbol } from 'date-fns/constants';
+
 
 // Registra la localización
 registerLocale('es', es);
