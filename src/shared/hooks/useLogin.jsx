@@ -34,7 +34,7 @@ export const useLogin = () => {
         if (rol === 'ADMIN') {
           navigate('/HistorialPV'); // Redirige a /HistorialPV si es ADMIN
         } else {
-          navigate('/Guardian'); // Redirige a /Guardian si no es ADMIN
+          navigate('/GuardianTelefono'); // Redirige a /Guardian si no es ADMIN
         }
         success = true;
       }
