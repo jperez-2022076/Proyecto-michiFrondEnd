@@ -7,15 +7,23 @@ import menuIcon from '../img/menu.png';
 const Navbar = ({ toggleSidebar }) => {
   const rol = localStorage.getItem('rol');
   const [torchOn, setTorchOn] = useState(() => localStorage.getItem('torchOn') === 'true');
-  const trackRef = useRef(null); // 🔹 Mantiene el `track` entre renders
+  const trackRef = useRef(null);
+
+  const setupCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      trackRef.current = stream.getVideoTracks()[0];
+    } catch (error) {
+      console.error("Error al acceder a la cámara:", error);
+      alert("No se pudo acceder a la cámara para usar la linterna.");
+    }
+  };
 
   const toggleFlash = async (forceState = null) => {
     try {
       if (!trackRef.current) {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-        trackRef.current = stream.getVideoTracks()[0]; // 🔹 Guardamos el track en `useRef`
+        await setupCamera();
       }
-
       if (trackRef.current) {
         const capabilities = trackRef.current.getCapabilities();
         if (capabilities.torch) {
@@ -29,14 +37,26 @@ const Navbar = ({ toggleSidebar }) => {
       }
     } catch (error) {
       console.error("Error al controlar el flash:", error);
-      alert("No se pudo acceder al flash.");
+      alert("No se pudo activar el flash.");
     }
   };
 
   useEffect(() => {
     if (torchOn) {
-      toggleFlash(true); // 🔹 Si estaba encendida antes, la encendemos de nuevo
+      toggleFlash(true);
     }
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden && localStorage.getItem('torchOn') === 'true') {
+        toggleFlash(true);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, []); // Se ejecuta al montar el componente
 
   return (
