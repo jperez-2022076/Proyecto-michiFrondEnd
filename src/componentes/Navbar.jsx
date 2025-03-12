@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLightbulb } from '@fortawesome/free-solid-svg-icons';
 import './Estilo.css';
@@ -6,23 +6,21 @@ import menuIcon from '../img/menu.png';
 
 const Navbar = ({ toggleSidebar }) => {
   const rol = localStorage.getItem('rol');
-  const [torchOn, setTorchOn] = useState(() => {
-    return localStorage.getItem('torchOn') === 'true';
-  });
-
-  let track = null;
+  const [torchOn, setTorchOn] = useState(() => localStorage.getItem('torchOn') === 'true');
+  const trackRef = useRef(null); // 🔹 Mantiene el `track` entre renders
 
   const toggleFlash = async (forceState = null) => {
     try {
-      if (!track) {
+      if (!trackRef.current) {
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-        track = stream.getVideoTracks()[0];
+        trackRef.current = stream.getVideoTracks()[0]; // 🔹 Guardamos el track en `useRef`
       }
-      if (track) {
-        const capabilities = track.getCapabilities();
+
+      if (trackRef.current) {
+        const capabilities = trackRef.current.getCapabilities();
         if (capabilities.torch) {
           const newState = forceState !== null ? forceState : !torchOn;
-          await track.applyConstraints({ advanced: [{ torch: newState }] });
+          await trackRef.current.applyConstraints({ advanced: [{ torch: newState }] });
           setTorchOn(newState);
           localStorage.setItem('torchOn', newState);
         } else {
@@ -37,7 +35,7 @@ const Navbar = ({ toggleSidebar }) => {
 
   useEffect(() => {
     if (torchOn) {
-      toggleFlash(true);
+      toggleFlash(true); // 🔹 Si estaba encendida antes, la encendemos de nuevo
     }
   }, []); // Se ejecuta al montar el componente
 
