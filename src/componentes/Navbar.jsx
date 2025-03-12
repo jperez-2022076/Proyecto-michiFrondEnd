@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLightbulb } from '@fortawesome/free-solid-svg-icons'; // Importamos los íconos
+import { faLightbulb } from '@fortawesome/free-solid-svg-icons';
 import './Estilo.css';
-import menuIcon from '../img/menu.png'
-
+import menuIcon from '../img/menu.png';
 
 const Navbar = ({ toggleSidebar }) => {
   const rol = localStorage.getItem('rol');
-  const [torchOn, setTorchOn] = useState(false);
+  const [torchOn, setTorchOn] = useState(() => {
+    return localStorage.getItem('torchOn') === 'true';
+  });
+
   let track = null;
 
-  const toggleFlash = async () => {
+  const toggleFlash = async (forceState = null) => {
     try {
       if (!track) {
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
@@ -19,8 +21,10 @@ const Navbar = ({ toggleSidebar }) => {
       if (track) {
         const capabilities = track.getCapabilities();
         if (capabilities.torch) {
-          track.applyConstraints({ advanced: [{ torch: !torchOn }] });
-          setTorchOn(!torchOn);
+          const newState = forceState !== null ? forceState : !torchOn;
+          await track.applyConstraints({ advanced: [{ torch: newState }] });
+          setTorchOn(newState);
+          localStorage.setItem('torchOn', newState);
         } else {
           alert("Tu dispositivo no soporta el uso del flash.");
         }
@@ -31,21 +35,25 @@ const Navbar = ({ toggleSidebar }) => {
     }
   };
 
+  useEffect(() => {
+    if (torchOn) {
+      toggleFlash(true);
+    }
+  }, []); // Se ejecuta al montar el componente
+
   return (
-    <>
-      <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top">
-        <button className="btn btn-link rounded-circle mr-3" onClick={toggleSidebar}>
-          <img src={menuIcon} alt="Toggle Sidebar" width="30" height="30" />
-        </button>
-        {rol === 'GUARDIAN' && (
-          <div className="ml-auto">
-            <button className="btn btn-link" onClick={toggleFlash} style={{ fontSize: '25px', marginTop: '15px', marginRight: '5px' }}>
-              <FontAwesomeIcon icon={faLightbulb} size="lg" color={torchOn ? "yellow" : "gray"} />
-            </button>
-          </div>
-        )}
-      </nav>
-    </>
+    <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top">
+      <button className="btn btn-link rounded-circle mr-3" onClick={toggleSidebar}>
+        <img src={menuIcon} alt="Toggle Sidebar" width="30" height="30" />
+      </button>
+      {rol === 'GUARDIAN' && (
+        <div className="ml-auto">
+          <button className="btn btn-link" onClick={() => toggleFlash()} style={{ fontSize: '25px', marginTop: '15px', marginRight: '5px' }}>
+            <FontAwesomeIcon icon={faLightbulb} size="lg" color={torchOn ? "yellow" : "gray"} />
+          </button>
+        </div>
+      )}
+    </nav>
   );
 };
 
