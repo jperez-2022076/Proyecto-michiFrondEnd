@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { error } from 'jquery';
+
 
 const apiClient = axios.create({
   baseURL: 'https://proyecto-michi.vercel.app',
@@ -86,6 +86,17 @@ export const listarPersonas = async () => {
     }
   }
 }
+export const listarPersonasJson = async () => {
+  try {
+    return await apiClient.get('https://proyecto-michi.vercel.app/persona/descargarPersona')
+  } catch (err) {
+    return {
+      error: true,
+      err
+    }
+  }
+}
+
 
 export const agregarPersonaResquest  = async(data)=>{
   try {
@@ -148,6 +159,17 @@ export const buscarPersonaId = async(id) =>{
 export const listarVehiculo = async() =>{
   try {
     return await apiClient.get('https://proyecto-michi.vercel.app/vehiculo/lista')
+  } catch (err) {
+    return {
+      error: true,
+      err
+    }
+  }
+}
+
+export const listarVehiculoJson = async () => {
+  try {
+    return await apiClient.get('https://proyecto-michi.vercel.app/vehiculo/descargarVehiculo')
   } catch (err) {
     return {
       error: true,

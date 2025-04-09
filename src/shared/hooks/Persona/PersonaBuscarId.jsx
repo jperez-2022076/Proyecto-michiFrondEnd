@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { buscarPersonaId } from "../../../services/api";
+
+
 
 const useBuscarPersonaId = (id) => {
   const [data, setData] = useState(null);
@@ -11,16 +12,28 @@ const useBuscarPersonaId = (id) => {
     const fetchPersona = async () => {
       setLoading(true);
       setError(null);
+
       try {
-        const response = await buscarPersonaId(id);
-        if (response.error) {
-          throw new Error(response.err.message);
+        const storedData = localStorage.getItem("personas");
+        if (storedData) {
+          const personas = JSON.parse(storedData);
+          const persona = personas.find(persona => persona._id === id);
+
+          if (persona) {
+            setData(persona);
+            setIsSuccess(true); 
+            setError(null);
+          } else {
+            setData(null); // Si no se encuentra, se asegura que data sea null
+            setIsSuccess(false);
+            setError("Error al buscar persona")
+          }
+        } else {
+          setIsSuccess(false); // Si no hay datos en localStorage
         }
-        setData(response.data);
-        setIsSuccess(true); // Marca como éxito si se obtuvo una persona
       } catch (err) {
         setError(err.message || 'Error al buscar persona');
-        setIsSuccess(false); // Marca como fracaso si hubo un error
+        setIsSuccess(false);
       } finally {
         setLoading(false);
       }
@@ -28,10 +41,11 @@ const useBuscarPersonaId = (id) => {
 
     if (id) {
       fetchPersona();
+    } else {
+      setLoading(false); // Si no hay id, simplemente termina el loading
     }
   }, [id]);
-
-  return { data, loading, error, isSuccess }; // Retorna el estado de éxito
+  return { data, loading, error, isSuccess }; // Retorna los estados, incluyendo isSuccess
 };
 
 export default useBuscarPersonaId;

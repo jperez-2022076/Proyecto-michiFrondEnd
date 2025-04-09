@@ -1,34 +1,52 @@
 import { useState, useEffect } from 'react';
-import { buscarVehiculoId } from "../../../services/api";
+
 
 const useBuscarVehiculoId = (id) => {
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Inicia como verdadero para cargar los datos
   const [error, setError] = useState(null);
+  const [isSuccess, setIsSuccess] = useState(false); // Agrega estado de éxito
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!id) return; // Si no hay id, no hacemos nada
+    const fetchVehiculo = async () => {
       setLoading(true);
-      setError(null); // Reinicia el error al hacer una nueva solicitud
-
+      setError(null);
+      console.log("paso vvehiculo")
       try {
-        const response = await buscarVehiculoId(id);
-        if (response.error) {
-          throw new Error(response.err || 'Error al buscar vehículo');
+        const storedData = localStorage.getItem("vehiculos"); // Obtener datos de localStorage
+        if (storedData) {
+          const vehiculos = JSON.parse(storedData);
+          const vehiculo = vehiculos.find(vehiculo => vehiculo._id === id); // Buscar el vehículo por id
+
+          if (vehiculo) {
+            setData(vehiculo);
+            setIsSuccess(true); 
+            setError(null);
+          } else {
+            setData(null); // Si no se encuentra, asegura que data sea null
+            setIsSuccess(false);
+            setError( 'Error al buscar vehículo');
+            console.log("Error")
+          }
+        } else {
+          setIsSuccess(false); // Si no hay datos en localStorage
         }
-        setData(response.data); // Asigna los datos recibidos
       } catch (err) {
-        setError(err.message); // Maneja el error
+        setError(err.message || 'Error al buscar vehículo');
+        setIsSuccess(false); // Si ocurre un error, setea isSuccess a false
       } finally {
         setLoading(false); // Finaliza la carga
       }
     };
 
-    fetchData();
-  }, [id]); // Efecto que se ejecuta cuando cambia el id
+    if (id) {
+      fetchVehiculo();
+    } else {
+      setLoading(false); // Si no hay id, termina el loading
+    }
+  }, [id]); // Se ejecuta cada vez que cambia el id
 
-  return { data, loading, error }; // Retorna los datos, estado de carga y error
+  return { data, loading, error, isSuccess }; // Retorna los datos, estado de carga, error y éxito
 };
 
 export default useBuscarVehiculoId;

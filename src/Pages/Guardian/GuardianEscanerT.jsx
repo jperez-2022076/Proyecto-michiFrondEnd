@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
 import Sidebar from '../../componentes/Sidebar';
 import Navbar from '../../componentes/Navbar';
@@ -11,16 +11,20 @@ import moment from 'moment';
 import BarcodeScannerComponent from 'react-qr-barcode-scanner';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { usePersonasDescargar } from '../../shared/hooks/Persona/descargarLista';
+import { useVehiculoDescargar } from '../../shared/hooks/Vehiculo/DescargarListaVehiculo';
+
 const GuardianEscanerTelefono = () => {
+
+  const { personas } = usePersonasDescargar();
+  const { vehiculos } = useVehiculoDescargar();
   const [isCameraOpen, setIsCameraOpen] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
   const [hasCameraPermission, setHasCameraPermission] = useState(null);
-  const [screenshot, setScreenshot] = useState(null);
-  const [barcode, setBarcode] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
   const hiddenInputRef = useRef(null);
   const [isSidebarVisible, setSidebarVisible] = useState(false);
-    const [showButtons, setShowButtons] = useState(false);
+  const [showButtons, setShowButtons] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [timeoutId, setTimeoutId] = useState(null);
   const [scannedId, setScannedId] = useState(null);
@@ -55,7 +59,7 @@ const GuardianEscanerTelefono = () => {
 
   //Este es el metodo que tengo que cambiar
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const handleHiddenInputChange = (e) => {
     if (isLoading) return;
 
@@ -63,52 +67,48 @@ const GuardianEscanerTelefono = () => {
     setIsLoading(true);
 
     if (timeoutId) {
-        clearTimeout(timeoutId);
+      clearTimeout(timeoutId);
     }
 
     const newTimeoutId = setTimeout(() => {
-        const id = data;
+      const id = data;
 
-        if (id.startsWith('Invitado')) {
-            const storedGuestData = JSON.parse(localStorage.getItem(id));
-            if (storedGuestData) {
-                setGuestData(storedGuestData);
-                setIsGuestDataRetrieved(true);
-            } else {
-                setGuestData({ nombre: '', dpi: '', placa: '', cliente: '' });
-                setIsGuestDataRetrieved(false);
-            }
-            setShowGuestForm(true);
-            setShowButtons(false);
+      if (id.startsWith('Invitado')) {
+        const storedGuestData = JSON.parse(localStorage.getItem(id));
+        if (storedGuestData) {
+          setGuestData(storedGuestData);
+          setIsGuestDataRetrieved(true);
         } else {
-              setIsPersonFound((prevIsPersonFound) => {
-                if (!prevIsPersonFound) {
-                    setScannedId(id);
-                    return true; 
-                } else {
-                    setScannedVehiculoId(id);
-                    
-                    return prevIsPersonFound; 
-                }
-            });
-            setShowButtons(true);
-            
+          setGuestData({ nombre: '', dpi: '', placa: '', cliente: '' });
+          setIsGuestDataRetrieved(false);
         }
+        setShowGuestForm(true);
+        setShowButtons(false);
+      } else {
+          if (!isPersonFound) {
+            setScannedId(id);
+          } else {
+            setScannedVehiculoId(id);
+            console.log("vehiculo")
+          }
 
-        setInputValue('');
-        e.target.value = '';
 
-        setIsLoading(false);
+      }
+
+      setInputValue('');
+      e.target.value = '';
+
+      setIsLoading(false);
     }, 1000);
 
     setTimeoutId(newTimeoutId);
-};
+  };
 
-const handleCancel = () => {
-  handleReset(); 
-};
+  const handleCancel = () => {
+    handleReset();
+  };
 
-<input
+  <input
     type="text"
     ref={hiddenInputRef}
     style={{ position: 'absolute', left: '0', top: '0', width: '1px', height: '1px', opacity: 0.1 }}
@@ -116,36 +116,38 @@ const handleCancel = () => {
     onChange={handleHiddenInputChange}
     autoFocus
     disabled={isLoading}  // 🔴 Deshabilitar input si está cargando
-/>
+  />
 
-{isCameraOpen && (
-    <div style={{ marginBottom: '20px', width: '100%', maxWidth: '400px' }}>
+  {
+    isCameraOpen && (
+      <div style={{ marginBottom: '20px', width: '100%', maxWidth: '400px' }}>
         <BarcodeScannerComponent
-            width="100%"
-            height="300px"
-            onUpdate={(err, result) => {
-                if (!isLoading && result) {  // 🔴 Evitar escaneo si está cargando
-                    handleHiddenInputChange({ target: { value: result.text } });
-                }
-            }}
-            stopStream={false}
-            onError={(err) => {
-                console.error('Error al usar la cámara:', err);
-                setErrorMessage('Error al usar la cámara.');
-            }}
+          width="100%"
+          height="300px"
+          onUpdate={(err, result) => {
+            if (!isLoading && result) {  // 🔴 Evitar escaneo si está cargando
+              handleHiddenInputChange({ target: { value: result.text } });
+            }
+          }}
+          stopStream={false}
+          onError={(err) => {
+            console.error('Error al usar la cámara:', err);
+            setErrorMessage('Error al usar la cámara.');
+          }}
         />
-    </div>
-)}
-
-useEffect(() => {
-  if (vehiculo && Object.keys(vehiculo).length > 0) {
-    const timer = setTimeout(() => {
-      handleSaveHistorial();
-    }, 1000);
-
-    return () => clearTimeout(timer); 
+      </div>
+    )
   }
-}, [vehiculo]);
+
+  useEffect(() => {
+    if (vehiculo && Object.keys(vehiculo).length > 0) {
+      const timer = setTimeout(() => {
+        handleSaveHistorial();
+      }, 4000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [vehiculo]);
 
   const handleSaveHistorial = async () => {
     const usuarioId = localStorage.getItem('id');
@@ -182,7 +184,7 @@ useEffect(() => {
       } else {
         toast.error('Error al guardar el historial de invitado.');
       }
-    } else if (isPersonFound && persona) {
+    } else if (isPersonSuccess && persona) {
       if (!scannedVehiculoId) {
         const dataHistorialP = {
           persona: persona._id,
@@ -231,13 +233,13 @@ useEffect(() => {
     setScannedVehiculoId(null);
     setShowButtons(false);
     setInputValue('');
-    setIsPersonFound(false); 
+
     setShowGuestForm(false);
     setGuestData({ nombre: '', dpi: '', placa: '', cliente: '' });
     hiddenInputRef.current.value = '';
     hiddenInputRef.current.focus();
     setScanMessage('Escanea una persona...');
-};
+  };
 
 
   const handleGuestInputChange = (e) => {
@@ -246,14 +248,19 @@ useEffect(() => {
   };
 
   useEffect(() => {
+
     if (isPersonSuccess) {
-      setShowGuestForm(false); // Ocultar formulario si se encuentra a la persona
+      setShowGuestForm(false); 
+      setShowButtons(true);
+      setIsPersonFound( true)
       setScanMessage('Escanea un vehículo...'); // Cambiar mensaje al encontrar persona
     }
   }, [isPersonSuccess, persona]);
 
   useEffect(() => {
     if (scannedVehiculoId) {
+      setShowButtons(true);
+      setIsPersonFound( true)
       setScanMessage('Escanea un vehículo...'); // Cambiar mensaje al escanear vehículo
     }
   }, [scannedVehiculoId]);
@@ -281,13 +288,16 @@ useEffect(() => {
     };
   }, []);
   useEffect(() => {
-    if (errorPersona && !scannedId.startsWith('Invitado')) {
-      toast.error('Error al buscar persona.');
-      setScannedId(null);
-      setScannedVehiculoId(null);
-      setIsPersonFound(false)
+    console.log(isPersonSuccess)
+    if(isPersonSuccess === false){
+      if (scannedId && !scannedId.startsWith('Invitado') && isPersonSuccess === false) {
+        toast.error('Error al buscar persona.');
+        setScannedId(null);
+        setScannedVehiculoId(null);
+      }
     }
-  }, [errorPersona]);
+  }, [scannedId]); // Se ejecutará cada vez que scannedId o isPersonSuccess cambien
+
   useEffect(() => {
     if (errorVehiculo) {
       toast.error('Error al buscar vehículo.');
@@ -338,7 +348,7 @@ useEffect(() => {
                 width="100%"
                 height="300px"
                 onUpdate={(err, result) => {
-                  if (!isLoading && result) { 
+                  if (!isLoading && result) {
                     handleHiddenInputChange({ target: { value: result.text } });
                   }
                 }}
