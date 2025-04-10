@@ -523,6 +523,7 @@ const Personas = () => {
     listarPersonas()
       .then((response) => {
         setPersonas(response.data);
+        console.log(response.data)
       })
       .catch((error) => {
         console.error('Error fetching users:', error);
@@ -620,6 +621,7 @@ const Personas = () => {
                     <table className="table table-bordered" ref={dataTableRef} width="100%" cellSpacing="0">
                     <thead>
                       <tr>
+                        <th>Código</th>
                         <th>Nombre</th>
                         <th>Teléfono</th>
                         <th>Cliente</th>
@@ -631,6 +633,7 @@ const Personas = () => {
                     <tbody>
                       {personas.map((persona, index) => (
                         <tr key={index}>
+                          <td>{persona._id}</td>
                           <td>{persona.nombre}</td>
                           <td>{persona.telefono}</td>
                           <td>{persona.cliente ? persona.cliente : "Sin cliente"}</td>

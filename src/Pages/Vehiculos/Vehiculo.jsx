@@ -761,6 +761,7 @@ const Vehiculos = () => {
                                     <table ref={dataTableRef} className="table table-bordered" width="100%" cellSpacing="0">
                                             <thead>
                                                 <tr>
+                                                     <th>Código</th>
                                                     <th>Placa</th>
                                                     <th>Código</th>
                                                     <th>Foto</th>
@@ -773,6 +774,7 @@ const Vehiculos = () => {
                                             <tbody>
                                                 {vehiculos.map((vehiculo, index) => (
                                                     <tr key={index}>
+                                                          <td>{vehiculo._id}</td>
                                                         <td>{vehiculo.placa}</td>
                                                         <td>{vehiculo.codigo ? vehiculo.codigo : "Sin código"}</td>
                                                         <td>
